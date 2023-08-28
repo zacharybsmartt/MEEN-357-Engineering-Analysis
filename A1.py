@@ -35,8 +35,35 @@ def A1_task2():
                  [2, 4, 6, 8], 
                  [3, 6, 9, 12], 
                  [4, 8, 12, 16]])
+    A_new = A.copy()
     
     C = A[::-1, ::-1]
+    C_new = C.copy()
 
-    b = 
+    b = np.array([[-4],
+                 [3],
+                 [-2],
+                 [1]])
+
+    d = -1 * b[::-1]
+
+    x = (A + np.transpose(A)) * b - C * d
+
+    A_new[:, [2, 3]] = A_new[:, [3, 2]]
+    C_new[[0, 2]] = C_new[[2, 0]]
+
+    x_new = (A_new + np.transpose(A_new)) * b - C_new * d
+    M = A + np.transpose(A_new)
+
+    M_max = np.max(M)
+    M_min = np.min(M)
+
+    return x, x_new, M_max, M_min
+
+
+A1_task2()
+
+# Task 2 Completed
+# Task 3 Below
+
 
