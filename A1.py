@@ -13,6 +13,7 @@ def sort_ascending(unsorted_list):
                 minimum = data
         sorted_list.append(minimum)
         unsorted_list.remove(minimum)
+
     return sorted_list
 
 
@@ -21,6 +22,7 @@ def A1_task1():
     random_list = [rand.randint(0,1000) for i in range(20)]
     sorted_list = sort_ascending(random_list)
     print(sorted_list)
+
     return sorted_list
 
 
