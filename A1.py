@@ -36,30 +36,29 @@ def A1_task2():
     A = np.array([[1, 2, 3, 4], 
                  [2, 4, 6, 8], 
                  [3, 6, 9, 12], 
-                 [4, 8, 12, 16]])
-    A_new = A.copy()
+                 [4, 8, 12, 16]]) # initialize array
+    A_new = A.copy() # create a copy of array
     
-    C = A[::-1, ::-1]
-    C_new = C.copy()
+    C = A[::-1, ::-1] # make columns rows and rows columns of A
+    C_new = C.copy() # create a copy of C
 
     b = np.array([[-4],
                  [3],
                  [-2],
-                 [1]])
+                 [1]]) # initialize column vector
 
-    d = -1 * b[::-1]
+    d = -1 * b[::-1] # flip the column vector and multiply its entirety by -1
 
-    x = (A + np.transpose(A)) * b - C * d
+    x = (A + np.transpose(A)) * b - C * d # calculate x
 
-    A_new[:, [2, 3]] = A_new[:, [3, 2]]
-    C_new[[0, 2]] = C_new[[2, 0]]
+    A_new[:, [2, 3]] = A_new[:, [3, 2]] # swap columns via array indexing, what was now 1 is now 3 and vice versa
+    C_new[[0, 2]] = C_new[[2, 0]] # more swapping
 
-    x_new = (A_new + np.transpose(A_new)) * b - C_new * d
-    M = A + np.transpose(A_new)
+    x_new = (A_new + np.transpose(A_new)) * b - C_new * d # calculation of x_new
+    M = A + np.transpose(A_new) # calculation of M
 
-    M_max = np.max(M)
-    M_min = np.min(M)
-
+    M_max = np.max(M) # max
+    M_min = np.min(M) # min
 
     return x, x_new, M_max, M_min
 
@@ -68,5 +67,3 @@ A1_task2()
 
 # Task 2 Completed
 # Task 3 Below
-
-
