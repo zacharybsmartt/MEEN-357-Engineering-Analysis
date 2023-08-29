@@ -60,6 +60,7 @@ def A1_task2():
     M_max = np.max(M)
     M_min = np.min(M)
 
+
     return x, x_new, M_max, M_min
 
 
