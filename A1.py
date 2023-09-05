@@ -68,3 +68,21 @@ A1_task2()
 
 # Task 2 Completed
 # Task 3 Below
+
+true_val = 6.737947 * 10 ** -3
+
+def gen_approx(n):
+    """This function generates our approximations given the nth term"""
+    result = 1 # value for term 0
+    x = -5
+
+    for terms in range(n):
+        if n == 1:
+            result = 1 - x
+            print("Term {}: {}" .format(n, result))
+            return result
+        else:
+            
+            print("Term {}: {}" .format(n, result))
+
+
