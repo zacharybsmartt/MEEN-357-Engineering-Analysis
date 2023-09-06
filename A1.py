@@ -50,7 +50,7 @@ def A1_task2():
 
     d = -1 * b[::-1] # flip the column vector and multiply its entirety by -1
 
-    x = (A + np.transpose(A)) * b - C * d # calculate x
+    x = (A + np.transpose(A)) @ b - C @ d # calculate x
 
     A_new[:, [2, 3]] = A_new[:, [3, 2]] # swap columns via array indexing, what was now 1 is now 3 and vice versa
     C_new[[0, 2]] = C_new[[2, 0]] # more swapping
