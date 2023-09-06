@@ -6,15 +6,6 @@ import matplotlib.pyplot as plt
 # finding methods from numpy or sympy to find the roots, then graph 
 # using matplotlib.pylot library and be able to see roots defined
 
-# x = symbols('x')
-
-# def f_output(x):
-#     f = x - np.cos(x)
-#     return f 
-
-# def main():
-
-
 # naveen
 def f(x):
     return x - np.cos(x)

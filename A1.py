@@ -1,7 +1,7 @@
 import random as rand
 import numpy as np
 import matplotlib.pyplot as plt
-
+from math import *
 #Task 1 Below this line
 
 def sort_ascending(unsorted_list):
@@ -55,7 +55,7 @@ def A1_task2():
     A_new[:, [2, 3]] = A_new[:, [3, 2]] # swap columns via array indexing, what was now 1 is now 3 and vice versa
     C_new[[0, 2]] = C_new[[2, 0]] # more swapping
 
-    x_new = (A_new + np.transpose(A_new)) * b - C_new * d # calculation of x_new
+    x_new = (A_new + np.transpose(A_new)) @ b - C_new @ d # calculation of x_new
     M = A + np.transpose(A_new) # calculation of M
 
     M_max = np.max(M) # max
@@ -67,22 +67,3 @@ def A1_task2():
 A1_task2()
 
 # Task 2 Completed
-# Task 3 Below
-
-true_val = 6.737947 * 10 ** -3
-
-def gen_approx(n):
-    """This function generates our approximations given the nth term"""
-    result = 1 # value for term 0
-    x = -5
-
-    for terms in range(n):
-        if n == 1:
-            result = 1 - x
-            print("Term {}: {}" .format(n, result))
-            return result
-        else:
-            
-            print("Term {}: {}" .format(n, result))
-
-
