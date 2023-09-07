@@ -37,19 +37,24 @@ def Approx_1(x, n):
             print("After", i, "terms: \ne^x = ", Approximation_1, "\nTrue error:", True_err, 
                 "\nApproximate Error:",Approximate_err, "\n")
     
-    print([Approximation_1_list])
+    print(Approximation_1_list)
+    print(True_error)
+    print(Approximate_error)
 
     plt.plot(list(range(0,n)),Approximation_1_list)
+    plt.title("Method 1")
     plt.xlabel("n iterations")
     plt.ylabel("Approximation")
     plt.show()
 
     plt.plot(list(range(0,n)),True_error)
+    plt.title("Method 1")
     plt.xlabel("n iterations")
     plt.ylabel("True Error")
     plt.show()
 
     plt.plot(list(range(0,n)),Approximate_error)
+    plt.title("Method 1")
     plt.xlabel("n iterations")
     plt.ylabel("Approximate Error")
     plt.show()    
@@ -70,18 +75,23 @@ def Approx_2(x, n):
             "\nApproximate Error:",Approximate_err, "\n")
     
     print([1/i for i in Approximation_2_list])
+    print(True_error)
+    print(Approximate_error)
 
     plt.plot(list(range(0,n)),[1/i for i in Approximation_2_list])
+    plt.title("Method 2")
     plt.xlabel("n iterations")
     plt.ylabel("Approximation")
     plt.show()
 
     plt.plot(list(range(0,n)),True_error)
+    plt.title("Method 2")
     plt.xlabel("n iterations")
     plt.ylabel("True Error")
     plt.show()
 
     plt.plot(list(range(0,n)),Approximate_error)
+    plt.title("Method 2")
     plt.xlabel("n iterations")
     plt.ylabel("Approximate Error")
     plt.show()
