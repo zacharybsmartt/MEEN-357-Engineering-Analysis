@@ -15,7 +15,7 @@ def Approx_1(x, n):
             Approximate_err = ((abs(Approximation_1_list[i-1]-Approximation_1))/Approximation_1_list[i-1])*100
             Approximate_error.append(Approximate_err)
             print("After", i, "terms: \ne^x = ", Approximation_1, "\nTrue error:", True_err, 
-                "\nApproximate Error:",Approximate_err, "\n")
+                  "\nApproximate Error:",Approximate_err, "\n")
             
         elif i % 2 == 0:
             Approximation_1 += (x ** i)/factorial(i)
@@ -57,7 +57,7 @@ def Approx_1(x, n):
     plt.title("Method 1")
     plt.xlabel("n iterations")
     plt.ylabel("Approximate Error")
-    plt.show()    
+    plt.show()
 
 
 def Approx_2(x, n):
