@@ -5,6 +5,10 @@ from define_rover import rover
 rover, planet = rover() # rover call to define all our variables
 
 def get_mass(rover):
+    """
+    This function computes rover mass in kilograms. It accounts for the chassis, power subsystem, science payload,
+    and six wheel assemblies, which itself is comprised of a motor, speed reducer, and the wheel itself.
+    """
     m = (
         6 * (rover['wheel_assembly']['wheel']['mass'] +
         rover['wheel_assembly']['speed_reducer']['mass'] +
@@ -16,27 +20,51 @@ def get_mass(rover):
     return m
 
 
-def get_gear_ratio(speed_reducer):
+def get_gear_ratio(speed_reducer): # good for now, need to edit later
+    """
+    This function computes the gear ratio of the speed reducer.
+    In later project phases, you will extend this to work for various types of speed reducers. For now, it needs to work
+    only with the simple reverted gear set described in Section 2.2
+    """
+    if type(speed_reducer) is not dict:
+        raise Exception("Invalid input: get_gear_ratio")
+
+    # elif speed_reducer['type'] != "reverted":
+    #     raise Exception("Invalid input: invalid type for speed_reducer")
+
+    else:
+        diameter_1 = rover['wheel_assembly']['speed_reducer']['diam_pinion']
+        diameter_2 = rover['wheel_assembly']['speed_reducer']['diam_gear']
+        Ng = (diameter_2 / diameter_1) ** 2
+    
     return Ng
 
 
 def tau_dcmotor(omega, motor):
+    """
+    This function returns the motor shaft torque in Nm given the shaft speed in rad/s and the motor specifications
+    structure (which defines the no-load speed, no-load torque, and stall speed, among other things.
+    This function must operate in a “vectorized” manner, meaning that if given a vector of motor shaft speeds, it
+    returns a vector of the same size consisting of the corresponding motor shaft torques.
+    """
+    
     return tau
 
 
-def F_drive(omega, rover):
-    return Fd
+# def F_drive(omega, rover):
+#     return Fd
 
 
-def F_gravity(terrain_angle, rover, planet):
-    return Fgt
+# def F_gravity(terrain_angle, rover, planet):
+#     return Fgt
 
 
-def F_rolling(omega, terrain_angle, rover, planet, Crr):
-    return Frr
+# def F_rolling(omega, terrain_angle, rover, planet, Crr):
+#     return Frr
 
 
-def F_net(omega, terrain_angle, rover, planet, Crr):
-    return Fnet
+# def F_net(omega, terrain_angle, rover, planet, Crr):
+#     return Fnet
 
 print(get_mass(rover)) #check step
+print(get_gear_ratio(rover))
