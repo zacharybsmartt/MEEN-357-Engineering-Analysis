@@ -1,7 +1,11 @@
 from math import *
 
+true_sol = 98.42768461593835 # the true solution to the integral, what will be the base for comparison later
+
+
 def fun(x):
-    return x * 2
+    return (x ** 2) * exp(x)
+
 
 def simpint(x, fx):
     I = 0
