@@ -2,9 +2,17 @@ from math import *
 from define_rover import rover
 
 # save space above for imports if need be
-rover = rover() # rover call to define all our variables
+rover, planet = rover() # rover call to define all our variables
 
 def get_mass(rover):
+    m = (
+        6 * (rover['wheel_assembly']['wheel']['mass'] +
+        rover['wheel_assembly']['speed_reducer']['mass'] +
+        rover['wheel_assembly']['motor']['mass']) +
+        rover['chassis']['mass'] +
+        rover['science_payload']['mass'] + 
+        rover['power_subsys']['mass']
+    )
     return m
 
 
@@ -31,3 +39,4 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
 def F_net(omega, terrain_angle, rover, planet, Crr):
     return Fnet
 
+print(get_mass(rover)) #check step
