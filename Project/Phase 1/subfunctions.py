@@ -1,5 +1,5 @@
 from math import *
-from define_rover import rover
+from define_rover import *
 
 # save space above for imports if need be
 rover, planet = rover() # rover call to define all our variables
@@ -20,7 +20,7 @@ def get_mass(rover):
     return m
 
 
-def get_gear_ratio(speed_reducer): # good for now, need to edit later
+def get_gear_ratio(speed_reducer): # should be good, just follows the formula given to us
     """
     This function computes the gear ratio of the speed reducer.
     In later project phases, you will extend this to work for various types of speed reducers. For now, it needs to work
@@ -29,13 +29,11 @@ def get_gear_ratio(speed_reducer): # good for now, need to edit later
     if type(speed_reducer) is not dict:
         raise Exception("Invalid input: get_gear_ratio")
 
-    # elif speed_reducer['type'] != "reverted":
-    #     raise Exception("Invalid input: invalid type for speed_reducer")
+    elif speed_reducer['type'].casefold() != "reverted":
+        raise Exception("Invalid input: invalid type for speed_reducer")
 
     else:
-        diameter_1 = rover['wheel_assembly']['speed_reducer']['diam_pinion']
-        diameter_2 = rover['wheel_assembly']['speed_reducer']['diam_gear']
-        Ng = (diameter_2 / diameter_1) ** 2
+        Ng = (speed_reducer['diam_gear'] / speed_reducer['diam_pinion']) ** 2
     
     return Ng
 
@@ -67,4 +65,4 @@ def tau_dcmotor(omega, motor):
 #     return Fnet
 
 print(get_mass(rover)) #check step
-print(get_gear_ratio(rover))
+print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step

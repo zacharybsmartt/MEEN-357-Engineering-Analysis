@@ -3,7 +3,8 @@
 
 
 def rover():
-    """Defines the rover, tbh this should be a class, will ask Dr. Thomas, units for everything follow
+    """
+    Defines the rover, units for everything follow
     m, kg, Nm, rad/s, and m/s^2.
     """
 
