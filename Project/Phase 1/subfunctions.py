@@ -50,6 +50,11 @@ def tau_dcmotor(omega, motor):
 
 
 # def F_drive(omega, rover):
+#take in the radius of the wheel from the rover file
+#determine the power for each wheel (6 are said to be identical) by multiplying tau and w that are retured from the speed reducer in the wheel
+#calculate the rpm of the wheel using the same w value
+#determine the drive force using the equation 30*power/(rpm*r*pi)
+#multiply this driving force by 6 to account for all six wheels
 #     return Fd
 
 
