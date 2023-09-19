@@ -1,7 +1,7 @@
 # we are using functions here to define our rovers in case there ends up being more than one rover with
 # different specs that we need to consider, eg rover_1, rover_2, rover_3 etc
 
-
+#comment from Jayden
 def rover():
     """
     Defines the rover, units for everything follow
