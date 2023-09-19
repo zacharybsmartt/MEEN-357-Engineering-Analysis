@@ -64,6 +64,7 @@ def tau_dcmotor(omega, motor):
 #given the terrain angle acquire the mass of the mover from the rover dict along with the gravity of the planet
 #the force due to gravity will be m*g*sin(terrain_angle) for the translational force due to gravity
 #determine if this force is going in the same direction of the rover such as up an incline or down an incline
+#if the force opposes the translational motion of the rover make negative, otherwise: positive
 #     return Fgt
 
 
