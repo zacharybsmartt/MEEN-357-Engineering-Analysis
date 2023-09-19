@@ -77,3 +77,4 @@ def tau_dcmotor(omega, motor):
 
 print(get_mass(rover)) #check step
 print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+# test for zachary
