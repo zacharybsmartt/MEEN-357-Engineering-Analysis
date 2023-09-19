@@ -56,6 +56,7 @@ def tau_dcmotor(omega, motor):
 #calculate the rpm of the wheel using the same w value
 #determine the drive force using the equation 30*power/(rpm*r*pi)
 #multiply this driving force by 6 to account for all six wheels
+#for each value in the omega list append to the array then at the end return these driving forces
 #     return Fd
 
 
