@@ -30,7 +30,6 @@ def simpint(x, fx):
 def fun(x):
     return [(i ** 2) * exp(i) for i in x]
 
-# Example usage:
 h15 = [0, 1.5, 3]
 Ih15 = simpint(h15, fun(h15)) # done
 
