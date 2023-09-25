@@ -81,4 +81,4 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
 print(get_mass(rover)) #check step
 print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
-# test for zachary
+# test for zachary, edit
