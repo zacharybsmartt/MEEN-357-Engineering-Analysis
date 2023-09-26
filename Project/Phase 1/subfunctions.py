@@ -96,7 +96,7 @@ def F_drive(omega, rover):
     
     #must call tau_dcmotor and get_gear_ratio
     wheelAssembly = rover['wheel_assembly']
-    gearRatio = get_gear_ratio(wheel_assembly['speed_reducer'])
+    gearRatio = get_gear_ratio(wheelAssembly['speed_reducer'])
     
     torqueInput = np.ndarray([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omegaList]) # get the torque inputs from the motor
     torqueOutput = torqueInput*gearRatio #perform a transformation over the speed reducer given by the gear ratio.
