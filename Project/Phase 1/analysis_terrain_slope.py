@@ -22,7 +22,7 @@ for i in range(len(v_max)):
     function = lambda omega: F_net(omega,float(slope_array_deg[i]),rover,planet,Crr)
     #Use Bisection root scalar method, assume we start from zero. Must have function, method, and bracket defined to use function
     solution = root_scalar(function,method='bisect',bracket = [0,no_load_speed])
-    v_max =[i] = (sol.root * wheel_radius)/ gear_ratio
+    v_max[i] = (sol.root * wheel_radius)/ gear_ratio
     
 #Produce Graphs#
 plt.plot(slope_array_deg,v_max)
