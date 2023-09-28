@@ -46,33 +46,30 @@ def tau_dcmotor(omega, motor):
     This function must operate in a “vectorized” manner, meaning that if given a vector of motor shaft speeds, it
     returns a vector of the same size consisting of the corresponding motor shaft torques.
     """
-        # Check that the first input is a scalar or a vector
-    if (type(omega) != int) and (type(omega) != float) and (not isinstance(omega, np.ndarray)):
-        raise Exception('First input must be a scalar or a vector. If input is a vector, it should be defined as a numpy array.')
-    elif not isinstance(omega, np.ndarray):
-        omega = np.array([omega],dtype=float) # make the scalar a numpy array
-    elif len(np.shape(omega)) != 1:
-        raise Exception('First input must be a scalar or a vector. Matrices are not allowed.')
+    # Check all inputs!!!
+    if np.ndim(omega) != 0 and np.ndim(omega) != 1:
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+    
+    elif type(rover) != dict:
+        raise Exception('Rover properties must be a dictionary')
+    
+    tau_stall = motor['torque_stall']
+    tau_noload = motor['torque_noload']
+    omega_noload = motor['speed_noload']
 
-    # Check that the second input is a dict
-    if type(motor) != dict:
-        raise Exception('Second input must be a dict')
-        
-    # Main code
-    tau_s    = motor['torque_stall']
-    tau_nl   = motor['torque_noload']
-    omega_nl = motor['speed_noload']
+    if np.ndim(omega) == 0:
+        return (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
     
-    # initialize
-    tau = np.zeros(len(omega),dtype = float)
-    for i in range(len(omega)):
-        if omega[i] >= 0 and omega[i] <= omega_nl:
-            tau[i] = tau_s - (tau_s-tau_nl)/omega_nl * omega[i]
-        elif omega[i] < 0:
-            tau[i] = tau_s
-        elif omega[i] > omega_nl:
-            tau[i] = 0
-    
+    tau = np.zeros(len(omega))
+
+    for w in range(len(omega)):
+        if omega[w] > omega_noload:
+            return 0
+        elif omega[w] < 0:
+            return tau_stall
+        else:
+            tau[w] = (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega[w])
+
     return tau
 
 
