@@ -130,17 +130,36 @@ def F_gravity(terrain_angle, rover, planet):
         
     rMass = get_mass(rover)
     accelFunc = lambda deg: planet['g'] * np.sin(deg * np.pi / 180) #get planet gravity and apply a terrain angle transform to get the acceleration along the path of travel.
-    Fgt = [-rMass*accelFunc(ang) for ang in listify] # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
+    Fgt = np.ndarray([-rMass*accelFunc(ang) for ang in listify]) # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
     return Fgt #observe the sign conventions.
 
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
-    #erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrainAngle)
+    # type validation of omega and terrain_angle
+    if  isNumeric := not isinstance(omega, (nd.float64, nd.float, nd.int, nd.intc, int, float)):
+        raise Exception('The parameter `omega` must be a scalar value or array.')
+    if (isNumeric and isinstance(terrain_angle, (nd.float64, nd.float, nd.int, nd.intc, int, float))) or not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
+        raise Exception('The parameter `terrain_angle` must match the type of omega.')
+    if len(terrain_angle) != len(omega):
+        raise Exception('The parameters `terrain_angle` and `omega` must either be vectors of the same length or scalars.')
+    if not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]):
+        raise Exception('The argument `terrain_angle` as a vector list must contain values between -75 and 75 degrees, inclusive.')
+    if not (isinstance(rover, dict) and isinstance(planet, dict)):
+        raise Exception('The arguments `rover` and `planet` must be a dictionary.')
+    if Crr <= 0:
+        raise Exception('The parameter `Crr` must be a positive scalar.')
+    roverMass = get_mass(rover)
+    wheelAssembly = 'wheel_assembly'
+    speedReducer = 'speed_reducer'
+    omegaWheel = omega / get_gear_ratio(rover[wheelAssembly][speedReducer])
+    roverVelocity = rover[wheelAssembly]['wheel']['radius'] * omegaWheel
+    planetGravity = planet['g']
+    Frr = -erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrain_angle)
     return Frr
 
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
-    #F_drive - F_rolling - F_gravity
+    #F_drive + F_rolling + F_gravity
     return Fnet
 
 print(get_mass(rover)) #check step
