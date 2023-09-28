@@ -186,11 +186,11 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
         if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
             if (terrain_angle > 75).any() or (terrain_angle < -75).any(): #degrees input
                 raise Exception("The second input is more than 75 or less than -75 degrees.")
-            F_net = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
+            Fnet = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
         elif np.isscalar(terrain_angle):
             if terrain_angle > 75 or terrain_angle < -75:
                 raise Exception("The second input is either greater than 75 or less than -75 degrees.")
-            F_net = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
+            Fnet = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
         else:
             raise Exception("The second input is not a scalar or a vector")   
     return Fnet
