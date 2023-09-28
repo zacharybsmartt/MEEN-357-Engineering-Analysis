@@ -136,11 +136,63 @@ def F_gravity(terrain_angle, rover, planet):
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     #erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrainAngle)
+    #This function computes the component of the force due to the rolling resistance (N) in the direction of translation
+    ####WHAT ABOUT SAME SIZE?####
+    ###### CHECKING CONDITIONS ########
+    if not isinstance(planet,dict) or isinstance(rover,dict):
+        raise Exception("The third or fourth inputs are not dictionaries.")
+    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
+        raise Exception("The first input is not a scalar or a vector")
+    else:
+        if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
+            if (terrain_angle > 75).any() or (terrain_angle < -75).any(): #degrees input
+                raise Exception("The second input is more than 75 or less than -75 degrees.")
+            F_normal = get_mass(rover) * planet['g'] * np.cos((np.pi/180) * terrain_angle)
+        elif np.isscalar(terrain_angle):
+            if terrain_angle > 75 or terrain_angle < -75:
+                raise Exception("The second input is either greater than 75 or less than -75 degrees.")
+            F_normal = get_mass(rover) * planet['g'] * np.cos((np.pi/180)*terrain_angle)
+        else:
+            raise Exception("The second input is not a scalar or a vector")
+    if not np.isscalar(Crr) or Crr < 0:
+        raise Exception("The fifth input is not a scalar or is not positive")
+
+    ####Evaluation Rolling Force#########
+    omega_output = omega / get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
+    F_rolling_resistance = -1 * F_normal * Crr
+    rover_tan_velocity = rover['wheel_assembly']['wheel']['radius'] * omega_output
+    
+    if np.isscalar(omega):
+        Frr = F_rolling_resistance * erf(40 * rover_tan_velocity)
+    else: #Then omega is an array
+        Frr = np.copy(omega) #Initialize a same-size array for Frr
+        for i in range(len(omega)):
+            Frr[i] = F_rolling_resistance[i] * erf(40 * rover_tan_velocity[i])
     return Frr
 
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     #F_drive - F_rolling - F_gravity
+        #This function computes the total force (N) acting on the rover in the direction of its motion
+    ####WHAT ABOUT SAME SIZE?####
+    ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
+    if not isinstance(planet,dict) or isinstance(rover,dict):
+        raise Exception("The third or fourth inputs are not dictionaries.")
+    if not np.isscalar(Crr) or Crr < 0:
+        raise Exception("The fifth input is not a scalar or is not positive")
+    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
+        raise Exception("The first input is not a scalar or a vector")
+    else:
+        if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
+            if (terrain_angle > 75).any() or (terrain_angle < -75).any(): #degrees input
+                raise Exception("The second input is more than 75 or less than -75 degrees.")
+            F_net = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
+        elif np.isscalar(terrain_angle):
+            if terrain_angle > 75 or terrain_angle < -75:
+                raise Exception("The second input is either greater than 75 or less than -75 degrees.")
+            F_net = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
+        else:
+            raise Exception("The second input is not a scalar or a vector")   
     return Fnet
 
 print(get_mass(rover)) #check step
