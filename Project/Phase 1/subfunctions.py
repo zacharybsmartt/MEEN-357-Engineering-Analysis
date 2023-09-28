@@ -169,11 +169,10 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
 
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
-    #F_drive - F_rolling - F_gravity
-        #This function computes the total force (N) acting on the rover in the direction of its motion
+    #This function computes the total force (N) acting on the rover in the direction of its motion
     ####WHAT ABOUT SAME SIZE?####
     ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
-    if not isinstance(planet,dict) or isinstance(rover,dict):
+    if not isinstance(planet,dict) or not isinstance(rover,dict):
         raise Exception("The third or fourth inputs are not dictionaries.")
     if not np.isscalar(Crr) or Crr < 0:
         raise Exception("The fifth input is not a scalar or is not positive")
@@ -189,5 +188,16 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
                 raise Exception("The second input is either greater than 75 or less than -75 degrees.")
             Fnet = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
         else:
-            raise Exception("The second input is not a scalar or a vector")   
+            raise Exception("The second input is not a scalar or a vector")
+            
     return Fnet
+
+#DOESNT WORK DUE TO ERRORS FOUND WITHIN F_drive & F_gravity and possibly tau_dcmotor
+print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
+print(F_drive(1,rover)) ###SHOULD EQUAL 7672
+print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+#Below Function Run correctly
+print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
+print(get_mass(rover)) #check step
+print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+# test for zachary, edit
