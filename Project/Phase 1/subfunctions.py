@@ -194,7 +194,3 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
         else:
             raise Exception("The second input is not a scalar or a vector")   
     return Fnet
-
-print(get_mass(rover)) #check step
-print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
-# test for zachary, edit

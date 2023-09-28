@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.olptimize import root_scalar
+from scipy.optimize import root_scalar
 from subfunctions import*
 from define_rover import*
 
