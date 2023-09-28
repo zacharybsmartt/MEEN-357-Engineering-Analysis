@@ -19,10 +19,9 @@ no_load_speed = rover['wheel_assembly']['motor']['speed_noload']
 v_max = slope_array_deg.copy()
 #Determine the Rover Maximum Velocity, Which Would Be When F_net is Equal to Zero
 for i in range(len(v_max)):
-    #Define function to use in the root scalar method
     function = lambda omega: F_net(omega,float(slope_array_deg[i]),rover,planet,Crr)
-    #Use root scalar method, assume we start from zero
-    solution = root_scalar(function,method='newton',bracket = [0,no_load_speed], x0 = 0)
+    #Use Bisection root scalar method, assume we start from zero. Must have function, method, and bracket defined to use function
+    solution = root_scalar(function,method='bisect',bracket = [0,no_load_speed])
     v_max =[i] = (sol.root * wheel_radius)/ gear_ratio
     
 #Produce Graphs#
@@ -31,4 +30,5 @@ plt.xlabel("Terrain Slope [degress]")
 plt.ylabel("Rover Maximum Velocity [m/s^2]")
 plt.title("Terrain Slope [deg] vs. Rover Maximum Velocity [m/s^2]")
 plt.show()
+
 
