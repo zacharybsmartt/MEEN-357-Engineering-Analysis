@@ -114,7 +114,7 @@ def F_gravity(terrain_angle, rover, planet):
     """
     
     #check the parameters
-    if not isinstance(terrain_angle, (np.float64, np.intc, np.double, np.ndarray, list)):
+    if not isinstance(terrain_angle, (int, float, np.float64, np.intc, np.double, np.ndarray, list)):
         raise Exception('The argument `terrain_angle` must be a scalar value or a vector of scalars.')
     if isinstance(terrain_angle, (list, np.ndarray)) and not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]): # confirm that all angles are between -75 and 75 degrees
         raise Exception('The argument `terrain_angle` as a vector list must contain values between -75 and 75 degrees, inclusive.')
