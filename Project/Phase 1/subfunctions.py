@@ -132,13 +132,12 @@ def F_gravity(terrain_angle, rover, planet):
 
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
-    #erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrainAngle)
     #This function computes the component of the force due to the rolling resistance (N) in the direction of translation
     ####WHAT ABOUT SAME SIZE?####
     ###### CHECKING CONDITIONS ########
-    if not isinstance(planet,dict) or isinstance(rover,dict):
+    if not isinstance(planet,dict) or not isinstance(rover,dict):
         raise Exception("The third or fourth inputs are not dictionaries.")
-    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
+    if not isinstance(omega,np.ndarray) and not np.isscalar(omega):
         raise Exception("The first input is not a scalar or a vector")
     else:
         if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
@@ -165,8 +164,8 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
         Frr = np.copy(omega) #Initialize a same-size array for Frr
         for i in range(len(omega)):
             Frr[i] = F_rolling_resistance[i] * erf(40 * rover_tan_velocity[i])
+    #erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrainAngle)
     return Frr
-
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     #This function computes the total force (N) acting on the rover in the direction of its motion
