@@ -10,7 +10,7 @@ from scipy.optimize import root_scalar
 
 #retrieve rover and planet values
 rover, planet = rover()
-gear_raio = get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
+gear_ratio = get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
 wheel_radius = rover['wheel_assembly']['wheel']['radius']
 #Create necessary Crr array
 Crr_array = np.linspace(0.01,0.4,25)
