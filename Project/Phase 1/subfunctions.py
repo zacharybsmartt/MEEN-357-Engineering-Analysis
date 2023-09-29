@@ -59,8 +59,8 @@ def tau_dcmotor(omega, motor):
     omega_noload = motor['speed_noload']
 
     if np.ndim(omega) == 0:
-        #print(tau_stall, tau_noload, omega_noload, omega)
-        return (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
+        tau = (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
+        return tau
     
     tau = np.zeros(len(omega))
 
@@ -76,15 +76,6 @@ def tau_dcmotor(omega, motor):
 
 
 def F_drive(omega, rover):
-    """
-    take in the radius of the wheel from the rover file
-    determine the power for each wheel (6 are said to be identical) by multiplying tau and w that are retured from the speed reducer in the wheel, 
-    which can be obtained by inputting the omega values given
-    calculate the rpm of the wheel using the same w value
-    determine the drive force using the equation 30*power/(rpm*r*pi)
-    multiply this driving force by 6 to account for all six wheels
-    for each value in the omega list append to the array then at the end return these driving forces
-    """
     if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, int, float, list)):
         raise Exception('The argument `omega` must be a scalar value or a vector of scalars.')
     if isinstance(omega, (list, np.ndarray)):
@@ -107,13 +98,6 @@ def F_drive(omega, rover):
 
 
 def F_gravity(terrain_angle, rover, planet):
-    """
-    given the terrain angle acquire the mass of the mover from the rover dict along with the gravity of the planet
-    the force due to gravity will be m*g*sin(terrain_angle) for the translational force due to gravity
-    determine if this force is going in the same direction of the rover such as up an incline or down an incline
-    if the force opposes the translational motion of the rover make negative, otherwise: positive
-    """
-    
     #check the parameters
     if not isinstance(terrain_angle, (int, float, np.float64, np.intc, np.double, np.ndarray, list)):
         raise Exception('The argument `terrain_angle` must be a scalar value or a vector of scalars.')
