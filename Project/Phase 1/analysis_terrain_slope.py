@@ -20,10 +20,6 @@ no_load_speed = rover['wheel_assembly']['motor']['speed_noload']
 v_max = slope_array_deg.copy()
 #Determine the Rover Maximum Velocity, Which Would Be When F_net is Equal to Zero
 for i in range(len(v_max)):
-    print(type(planet))
-    print(type(rover))
-    print(not isinstance(planet,dict))
-    print(not isinstance(rover,dict))
     function = lambda omega: F_net(omega,float(slope_array_deg[i]),rover,planet,Crr)
     #Use Bisection root scalar method, assume we start from zero. Must have function, method, and bracket defined to use function
     solution = root_scalar(function,method='bisect',bracket = [0,no_load_speed])
