@@ -179,7 +179,7 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
             
     return Fnet
 
-# #DOESNT WORK DUE TO ERRORS FOUND WITHIN F_drive & F_gravity and possibly tau_dcmotor
+#Check Outputs
 # print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
 # print(F_drive(1,rover)) ###SHOULD EQUAL 7672
 # print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
