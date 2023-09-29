@@ -31,4 +31,4 @@ xlabel('Speed Reducer Speed [rad/s]')
 ylabel('Speed Reducer Power [W]')
 
 # If you need to see graphs for report
-show()
+# show()

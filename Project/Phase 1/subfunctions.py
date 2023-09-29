@@ -179,24 +179,24 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
             
     return Fnet
 
-#DOESNT WORK DUE TO ERRORS FOUND WITHIN F_drive & F_gravity and possibly tau_dcmotor
-print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
-print(F_drive(1,rover)) ###SHOULD EQUAL 7672
-print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
-#Below Function Run correctly
-print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
-print(get_mass(rover)) #check step
-print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+# #DOESNT WORK DUE TO ERRORS FOUND WITHIN F_drive & F_gravity and possibly tau_dcmotor
+# print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
+# print(F_drive(1,rover)) ###SHOULD EQUAL 7672
+# print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+# #Below Function Run correctly
+# print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
+# print(get_mass(rover)) #check step
+# print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
 
 
-#check for vector output
-arN = np.array([5,5,5])
-arS = np.array([1,1,1])
-print(F_gravity(arN,rover,planet)) ###SHOULD EQUAL -282
-print(F_drive(arS,rover)) ###SHOULD EQUAL 7672
-print(F_net(arS,arN,rover,planet,0.1)) ###SHOULD EQUAL 7069###
-#Below Function Run correctly
-print(F_rolling(arS,arN,rover,planet,0.1)) ###SHOULD EQUAL -322###
-print(get_mass(rover)) #check step
-print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
-# test for zachary, edit
+# #check for vector output
+# arN = np.array([5,5,5])
+# arS = np.array([1,1,1])
+# print(F_gravity(arN,rover,planet)) ###SHOULD EQUAL -282
+# print(F_drive(arS,rover)) ###SHOULD EQUAL 7672
+# print(F_net(arS,arN,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+# #Below Function Run correctly
+# print(F_rolling(arS,arN,rover,planet,0.1)) ###SHOULD EQUAL -322###
+# print(get_mass(rover)) #check step
+# print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+# # test for zachary, edit
