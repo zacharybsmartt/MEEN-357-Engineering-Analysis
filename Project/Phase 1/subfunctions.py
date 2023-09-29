@@ -46,33 +46,30 @@ def tau_dcmotor(omega, motor):
     This function must operate in a “vectorized” manner, meaning that if given a vector of motor shaft speeds, it
     returns a vector of the same size consisting of the corresponding motor shaft torques.
     """
-        # Check that the first input is a scalar or a vector
-    if (type(omega) != int) and (type(omega) != float) and (not isinstance(omega, np.ndarray)):
-        raise Exception('First input must be a scalar or a vector. If input is a vector, it should be defined as a numpy array.')
-    elif not isinstance(omega, np.ndarray):
-        omega = np.array([omega],dtype=float) # make the scalar a numpy array
-    elif len(np.shape(omega)) != 1:
-        raise Exception('First input must be a scalar or a vector. Matrices are not allowed.')
+    # Check all inputs!!!
+    if np.ndim(omega) != 0 and np.ndim(omega) != 1:
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+    
+    elif type(rover) != dict:
+        raise Exception('Rover properties must be a dictionary')
+    
+    tau_stall = motor['torque_stall']
+    tau_noload = motor['torque_noload']
+    omega_noload = motor['speed_noload']
 
-    # Check that the second input is a dict
-    if type(motor) != dict:
-        raise Exception('Second input must be a dict')
-        
-    # Main code
-    tau_s    = motor['torque_stall']
-    tau_nl   = motor['torque_noload']
-    omega_nl = motor['speed_noload']
+    if np.ndim(omega) == 0:
+        return (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
     
-    # initialize
-    tau = np.zeros(len(omega),dtype = float)
-    for i in range(len(omega)):
-        if omega[i] >= 0 and omega[i] <= omega_nl:
-            tau[i] = tau_s - (tau_s-tau_nl)/omega_nl * omega[i]
-        elif omega[i] < 0:
-            tau[i] = tau_s
-        elif omega[i] > omega_nl:
-            tau[i] = 0
-    
+    tau = np.zeros(len(omega))
+
+    for w in range(len(omega)):
+        if omega[w] > omega_noload:
+            return 0
+        elif omega[w] < 0:
+            return tau_stall
+        else:
+            tau[w] = (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega[w])
+
     return tau
 
 
@@ -136,9 +133,9 @@ def F_gravity(terrain_angle, rover, planet):
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
-    if  isNumeric := not isinstance(omega, (nd.float64, nd.float, nd.int, nd.intc, int, float)):
+    if  isNumeric := not isinstance(omega, (np.float64, np.float, np.int, np.intc, int, float)):
         raise Exception('The parameter `omega` must be a scalar value or array.')
-    if (isNumeric and isinstance(terrain_angle, (nd.float64, nd.float, nd.int, nd.intc, int, float))) or not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
+    if (isNumeric and isinstance(terrain_angle, (np.float64, np.float, np.int, np.intc, int, float))) or not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
         raise Exception('The parameter `terrain_angle` must match the type of omega.')
     if len(terrain_angle) != len(omega):
         raise Exception('The parameters `terrain_angle` and `omega` must either be vectors of the same length or scalars.')
@@ -157,11 +154,36 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     Frr = -erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrain_angle)
     return Frr
 
-
 def F_net(omega, terrain_angle, rover, planet, Crr):
-    #F_drive + F_rolling + F_gravity
+    #This function computes the total force (N) acting on the rover in the direction of its motion
+    ####WHAT ABOUT SAME SIZE?####
+    ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
+    if not isinstance(planet,dict) or not isinstance(rover,dict):
+        raise Exception("The third or fourth inputs are not dictionaries.")
+    if not np.isscalar(Crr) or Crr < 0:
+        raise Exception("The fifth input is not a scalar or is not positive")
+    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
+        raise Exception("The first input is not a scalar or a vector")
+    else:
+        if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
+            if (terrain_angle > 75).any() or (terrain_angle < -75).any(): #degrees input
+                raise Exception("The second input is more than 75 or less than -75 degrees.")
+            Fnet = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
+        elif np.isscalar(terrain_angle):
+            if terrain_angle > 75 or terrain_angle < -75:
+                raise Exception("The second input is either greater than 75 or less than -75 degrees.")
+            Fnet = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
+        else:
+            raise Exception("The second input is not a scalar or a vector")
+            
     return Fnet
 
+#DOESNT WORK DUE TO ERRORS FOUND WITHIN F_drive & F_gravity and possibly tau_dcmotor
+print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
+print(F_drive(1,rover)) ###SHOULD EQUAL 7672
+print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+#Below Function Run correctly
+print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
 print(get_mass(rover)) #check step
 print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
 # test for zachary, edit
