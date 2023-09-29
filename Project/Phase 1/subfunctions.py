@@ -58,7 +58,8 @@ def tau_dcmotor(omega, motor):
     omega_noload = motor['speed_noload']
 
     if np.ndim(omega) == 0:
-        return (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
+        tau = (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
+        return tau
     
     tau = np.zeros(len(omega))
 
