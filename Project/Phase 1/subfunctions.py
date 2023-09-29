@@ -87,17 +87,19 @@ def F_drive(omega, rover):
     """
     if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, int, float, list)):
         raise Exception('The argument `omega` must be a scalar value or a vector of scalars.')
-    omegaList = np.array([omega])
-    if isinstance(omega, list):
-        omegaList = np.array(omega) # omega as an np.ndarray. Handles if omega is a scalar.
+    if isinstance(omega, (list, np.ndarray)):
+        omegaList = np.array(omega) # omega as an np.ndarray. Handles if omega is a list.
     if not isinstance(rover, dict):
         raise Exception('The argument `rover` must be a dictionary type.')
     
     #must call tau_dcmotor and get_gear_ratio
     wheelAssembly = rover['wheel_assembly']
     gearRatio = get_gear_ratio(wheelAssembly['speed_reducer'])
-    
-    torqueInput = np.array([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omegaList], dtype = float) # get the torque inputs from the motor
+    torqueInput = 0
+    if isinstance(omega, (np.ndarray)):
+        torqueInput = np.array([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omega], dtype = float) # get the torque inputs from the motor
+    elif np.isscalar(omega):
+       torqueInput = tau_dcmotor(omega, wheelAssembly['motor']) 
     torqueOutput = torqueInput*gearRatio #perform a transformation over the speed reducer given by the gear ratio.
     #print('torque:',torqueInput, 'gear:', gearRatio)
     Fd = 6*torqueOutput / wheelAssembly['wheel']['radius'] #find the drive force of the wheel by taking the output torque and applying it to the wheel.
@@ -130,12 +132,16 @@ def F_gravity(terrain_angle, rover, planet):
     rMass = get_mass(rover)
     accelFunc = lambda deg: planet['g'] * np.sin(degToRad(deg)) #get planet gravity and apply a terrain angle transform to get the acceleration along the path of travel.
     Fgt = np.array([-1 * rMass*accelFunc(ang) for ang in listify], dtype = float) # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
+    
+    if np.isscalar(terrain_angle):
+        return float(Fgt[0])
+    
     return Fgt #observe the sign conventions.
 
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
-    if  not (isNumeric := isinstance(omega, (np.float64, np.intc, int, float))):
+    if not (isNumeric := isinstance(omega, (np.float64, np.intc, int, float))) and not isinstance(omega, np.ndarray):
         raise Exception('The parameter `omega` must be a scalar value or array.')
 
     if (isNumeric and not isinstance(terrain_angle, (np.float64, np.intc, int, float))) or not isNumeric and not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
@@ -158,7 +164,11 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     omegaWheel = omega / get_gear_ratio(rover[wheelAssembly][speedReducer])
     roverVelocity = rover[wheelAssembly]['wheel']['radius'] * omegaWheel
     planetGravity = planet['g']
-    Frr = -erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(degToRad(terrain_angle))
+    if isinstance(roverVelocity, np.ndarray):
+        erfValue = np.array([erf(40*v) for v in roverVelocity])
+    elif np.isscalar(roverVelocity):
+        erfValue = erf(40*roverVelocity)
+    Frr =  -erfValue * Crr * roverMass * planetGravity * np.cos(degToRad(terrain_angle))
     return Frr
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
@@ -191,6 +201,18 @@ print(F_drive(1,rover)) ###SHOULD EQUAL 7672
 print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
 #Below Function Run correctly
 print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
+print(get_mass(rover)) #check step
+print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+
+
+#check for vector output
+arN = np.array([5,5,5])
+arS = np.array([1,1,1])
+print(F_gravity(arN,rover,planet)) ###SHOULD EQUAL -282
+print(F_drive(arS,rover)) ###SHOULD EQUAL 7672
+print(F_net(arS,arN,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+#Below Function Run correctly
+print(F_rolling(arS,arN,rover,planet,0.1)) ###SHOULD EQUAL -322###
 print(get_mass(rover)) #check step
 print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
 # test for zachary, edit
