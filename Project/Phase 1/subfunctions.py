@@ -4,6 +4,7 @@ import numpy as np
 
 # save space above for imports if need be
 rover, planet = rover() # rover call to define all our variables
+degToRad = lambda deg: deg * np.pi / 180
 
 def get_mass(rover):
     """
@@ -75,20 +76,11 @@ def tau_dcmotor(omega, motor):
 
 
 def F_drive(omega, rover):
-    """
-    take in the radius of the wheel from the rover file
-    determine the power for each wheel (6 are said to be identical) by multiplying tau and w that are retured from the speed reducer in the wheel, 
-    which can be obtained by inputting the omega values given
-    calculate the rpm of the wheel using the same w value
-    determine the drive force using the equation 30*power/(rpm*r*pi)
-    multiply this driving force by 6 to account for all six wheels
-    for each value in the omega list append to the array then at the end return these driving forces
-    """
-    if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, list)):
+    if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, int, float, list)):
         raise Exception('The argument `omega` must be a scalar value or a vector of scalars.')
-    omegaList = np.ndarray([omega])
+    omegaList = np.array([omega])
     if isinstance(omega, list):
-        omegaList = np.ndarray(omega) # omega as an np.ndarray. Handles if omega is a scalar.
+        omegaList = np.array(omega) # omega as an np.ndarray. Handles if omega is a scalar.
     if not isinstance(rover, dict):
         raise Exception('The argument `rover` must be a dictionary type.')
     
@@ -96,21 +88,14 @@ def F_drive(omega, rover):
     wheelAssembly = rover['wheel_assembly']
     gearRatio = get_gear_ratio(wheelAssembly['speed_reducer'])
     
-    torqueInput = np.ndarray([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omegaList]) # get the torque inputs from the motor
+    torqueInput = np.array([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omegaList], dtype = float) # get the torque inputs from the motor
     torqueOutput = torqueInput*gearRatio #perform a transformation over the speed reducer given by the gear ratio.
-    
+    #print('torque:',torqueInput, 'gear:', gearRatio)
     Fd = 6*torqueOutput / wheelAssembly['wheel']['radius'] #find the drive force of the wheel by taking the output torque and applying it to the wheel.
     return Fd
 
 
 def F_gravity(terrain_angle, rover, planet):
-    """
-    given the terrain angle acquire the mass of the mover from the rover dict along with the gravity of the planet
-    the force due to gravity will be m*g*sin(terrain_angle) for the translational force due to gravity
-    determine if this force is going in the same direction of the rover such as up an incline or down an incline
-    if the force opposes the translational motion of the rover make negative, otherwise: positive
-    """
-    
     #check the parameters
     if not isinstance(terrain_angle, (int, float, np.float64, np.intc, np.double, np.ndarray, list)):
         raise Exception('The argument `terrain_angle` must be a scalar value or a vector of scalars.')
@@ -127,58 +112,48 @@ def F_gravity(terrain_angle, rover, planet):
         listify = np.array(terrain_angle)
         
     rMass = get_mass(rover)
-    accelFunc = lambda deg: planet['g'] * np.sin(deg * np.pi / 180) #get planet gravity and apply a terrain angle transform to get the acceleration along the path of travel.
-    Fgt = [-rMass*accelFunc(ang) for ang in listify] # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
+    accelFunc = lambda deg: planet['g'] * np.sin(degToRad(deg)) #get planet gravity and apply a terrain angle transform to get the acceleration along the path of travel.
+    Fgt = np.array([-1 * rMass*accelFunc(ang) for ang in listify], dtype = float) # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
     return Fgt #observe the sign conventions.
 
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
-    #erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrainAngle)
-    #This function computes the component of the force due to the rolling resistance (N) in the direction of translation
-    ####WHAT ABOUT SAME SIZE?####
-    ###### CHECKING CONDITIONS ########
-    if not isinstance(planet,dict) or isinstance(rover,dict):
-        raise Exception("The third or fourth inputs are not dictionaries.")
-    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
-        raise Exception("The first input is not a scalar or a vector")
-    else:
-        if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
-            if (terrain_angle > 75).any() or (terrain_angle < -75).any(): #degrees input
-                raise Exception("The second input is more than 75 or less than -75 degrees.")
-            F_normal = get_mass(rover) * planet['g'] * np.cos((np.pi/180) * terrain_angle)
-        elif np.isscalar(terrain_angle):
-            if terrain_angle > 75 or terrain_angle < -75:
-                raise Exception("The second input is either greater than 75 or less than -75 degrees.")
-            F_normal = get_mass(rover) * planet['g'] * np.cos((np.pi/180)*terrain_angle)
-        else:
-            raise Exception("The second input is not a scalar or a vector")
-    if not np.isscalar(Crr) or Crr < 0:
-        raise Exception("The fifth input is not a scalar or is not positive")
+    # type validation of omega and terrain_angle
+    if  not (isNumeric := isinstance(omega, (np.float64, np.intc, int, float))):
+        raise Exception('The parameter `omega` must be a scalar value or array.')
 
-    ####Evaluation Rolling Force#########
-    omega_output = omega / get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
-    F_rolling_resistance = -1 * F_normal * Crr
-    rover_tan_velocity = rover['wheel_assembly']['wheel']['radius'] * omega_output
+    if (isNumeric and not isinstance(terrain_angle, (np.float64, np.intc, int, float))) or not isNumeric and not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
+        raise Exception('The parameter `terrain_angle` must match the type of omega.')
     
-    if np.isscalar(omega):
-        Frr = F_rolling_resistance * erf(40 * rover_tan_velocity)
-    else: #Then omega is an array
-        Frr = np.copy(omega) #Initialize a same-size array for Frr
-        for i in range(len(omega)):
-            Frr[i] = F_rolling_resistance[i] * erf(40 * rover_tan_velocity[i])
+    if not isNumeric:
+        if len(terrain_angle) != len(omega):
+            raise Exception('The parameters `terrain_angle` and `omega` must either be vectors of the same length or scalars.')
+        if not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]):
+            raise Exception('The argument `terrain_angle` as a vector list must contain values between -75 and 75 degrees, inclusive.')
+    
+    if not (isinstance(rover, dict) and isinstance(planet, dict)):
+        raise Exception('The arguments `rover` and `planet` must be a dictionary.')
+    if Crr <= 0:
+        raise Exception('The parameter `Crr` must be a positive scalar.')
+        
+    roverMass = get_mass(rover)
+    wheelAssembly = 'wheel_assembly'
+    speedReducer = 'speed_reducer'
+    omegaWheel = omega / get_gear_ratio(rover[wheelAssembly][speedReducer])
+    roverVelocity = rover[wheelAssembly]['wheel']['radius'] * omegaWheel
+    planetGravity = planet['g']
+    Frr = -erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(degToRad(terrain_angle))
     return Frr
 
-
 def F_net(omega, terrain_angle, rover, planet, Crr):
-    #F_drive - F_rolling - F_gravity
-        #This function computes the total force (N) acting on the rover in the direction of its motion
+    #This function computes the total force (N) acting on the rover in the direction of its motion
     ####WHAT ABOUT SAME SIZE?####
     ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
-    if not isinstance(planet,dict) or isinstance(rover,dict):
+    if not isinstance(planet,dict) or not isinstance(rover,dict):
         raise Exception("The third or fourth inputs are not dictionaries.")
     if not np.isscalar(Crr) or Crr < 0:
         raise Exception("The fifth input is not a scalar or is not positive")
-    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
+    if not isinstance(omega,np.ndarray) and not np.isscalar(omega):
         raise Exception("The first input is not a scalar or a vector")
     else:
         if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
@@ -190,5 +165,16 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
                 raise Exception("The second input is either greater than 75 or less than -75 degrees.")
             Fnet = F_rolling(omega,terrain_angle,rover,planet,Crr) + F_gravity(terrain_angle,rover,planet) + F_drive(omega,rover)
         else:
-            raise Exception("The second input is not a scalar or a vector")   
+            raise Exception("The second input is not a scalar or a vector")
+            
     return Fnet
+
+#DOESNT WORK DUE TO ERRORS FOUND WITHIN F_drive & F_gravity and possibly tau_dcmotor
+print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
+print(F_drive(1,rover)) ###SHOULD EQUAL 7672
+print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+#Below Function Run correctly
+print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
+print(get_mass(rover)) #check step
+print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+# test for zachary, edit
