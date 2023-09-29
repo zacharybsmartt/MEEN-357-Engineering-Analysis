@@ -4,6 +4,7 @@ import numpy as np
 
 # save space above for imports if need be
 rover, planet = rover() # rover call to define all our variables
+degToRad = lambda deg: deg * np.pi / 180
 
 def get_mass(rover):
     """
@@ -58,6 +59,7 @@ def tau_dcmotor(omega, motor):
     omega_noload = motor['speed_noload']
 
     if np.ndim(omega) == 0:
+        #print(tau_stall, tau_noload, omega_noload, omega)
         return (tau_stall - ((tau_stall - tau_noload) / omega_noload) * omega)
     
     tau = np.zeros(len(omega))
@@ -83,11 +85,11 @@ def F_drive(omega, rover):
     multiply this driving force by 6 to account for all six wheels
     for each value in the omega list append to the array then at the end return these driving forces
     """
-    if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, list)):
+    if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, int, float, list)):
         raise Exception('The argument `omega` must be a scalar value or a vector of scalars.')
-    omegaList = np.ndarray([omega])
+    omegaList = np.array([omega])
     if isinstance(omega, list):
-        omegaList = np.ndarray(omega) # omega as an np.ndarray. Handles if omega is a scalar.
+        omegaList = np.array(omega) # omega as an np.ndarray. Handles if omega is a scalar.
     if not isinstance(rover, dict):
         raise Exception('The argument `rover` must be a dictionary type.')
     
@@ -95,9 +97,9 @@ def F_drive(omega, rover):
     wheelAssembly = rover['wheel_assembly']
     gearRatio = get_gear_ratio(wheelAssembly['speed_reducer'])
     
-    torqueInput = np.ndarray([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omegaList]) # get the torque inputs from the motor
+    torqueInput = np.array([tau_dcmotor(OM, wheelAssembly['motor']) for OM in omegaList], dtype = float) # get the torque inputs from the motor
     torqueOutput = torqueInput*gearRatio #perform a transformation over the speed reducer given by the gear ratio.
-    
+    #print('torque:',torqueInput, 'gear:', gearRatio)
     Fd = 6*torqueOutput / wheelAssembly['wheel']['radius'] #find the drive force of the wheel by taking the output torque and applying it to the wheel.
     return Fd
 
@@ -126,32 +128,37 @@ def F_gravity(terrain_angle, rover, planet):
         listify = np.array(terrain_angle)
         
     rMass = get_mass(rover)
-    accelFunc = lambda deg: planet['g'] * np.sin(deg * np.pi / 180) #get planet gravity and apply a terrain angle transform to get the acceleration along the path of travel.
-    Fgt = np.ndarray([-rMass*accelFunc(ang) for ang in listify]) # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
+    accelFunc = lambda deg: planet['g'] * np.sin(degToRad(deg)) #get planet gravity and apply a terrain angle transform to get the acceleration along the path of travel.
+    Fgt = np.array([-1 * rMass*accelFunc(ang) for ang in listify], dtype = float) # apply a list transformation. Like C# .Select(). Negative to account for the true direction of the vector.
     return Fgt #observe the sign conventions.
 
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
-    if  isNumeric := not isinstance(omega, (np.float64, np.float, np.int, np.intc, int, float)):
+    if  not (isNumeric := isinstance(omega, (np.float64, np.intc, int, float))):
         raise Exception('The parameter `omega` must be a scalar value or array.')
-    if (isNumeric and isinstance(terrain_angle, (np.float64, np.float, np.int, np.intc, int, float))) or not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
+
+    if (isNumeric and not isinstance(terrain_angle, (np.float64, np.intc, int, float))) or not isNumeric and not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
         raise Exception('The parameter `terrain_angle` must match the type of omega.')
-    if len(terrain_angle) != len(omega):
-        raise Exception('The parameters `terrain_angle` and `omega` must either be vectors of the same length or scalars.')
-    if not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]):
-        raise Exception('The argument `terrain_angle` as a vector list must contain values between -75 and 75 degrees, inclusive.')
+    
+    if not isNumeric:
+        if len(terrain_angle) != len(omega):
+            raise Exception('The parameters `terrain_angle` and `omega` must either be vectors of the same length or scalars.')
+        if not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]):
+            raise Exception('The argument `terrain_angle` as a vector list must contain values between -75 and 75 degrees, inclusive.')
+    
     if not (isinstance(rover, dict) and isinstance(planet, dict)):
         raise Exception('The arguments `rover` and `planet` must be a dictionary.')
     if Crr <= 0:
         raise Exception('The parameter `Crr` must be a positive scalar.')
+        
     roverMass = get_mass(rover)
     wheelAssembly = 'wheel_assembly'
     speedReducer = 'speed_reducer'
     omegaWheel = omega / get_gear_ratio(rover[wheelAssembly][speedReducer])
     roverVelocity = rover[wheelAssembly]['wheel']['radius'] * omegaWheel
     planetGravity = planet['g']
-    Frr = -erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(terrain_angle)
+    Frr = -erf(40 * roverVelocity) * Crr * roverMass * planetGravity * np.cos(degToRad(terrain_angle))
     return Frr
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
@@ -162,7 +169,7 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
         raise Exception("The third or fourth inputs are not dictionaries.")
     if not np.isscalar(Crr) or Crr < 0:
         raise Exception("The fifth input is not a scalar or is not positive")
-    if not isinstance(omega,np.ndarray) or not np.isscalar(omega):
+    if not isinstance(omega,np.ndarray) and not np.isscalar(omega):
         raise Exception("The first input is not a scalar or a vector")
     else:
         if isinstance(terrain_angle,np.ndarray): #Evaluate for if the given terrain_angle is an array
