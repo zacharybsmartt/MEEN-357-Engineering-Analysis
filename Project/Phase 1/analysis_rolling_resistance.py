@@ -24,11 +24,11 @@ noload_speed = rover['wheel_assembly']['motor']['speed_noload']
 for i in range(len(v_max)):
     function = lambda omega: F_net(omega,terrain_slope,rover,planet,float(Crr_array[i]))
     #Use Bisection root scalar method, assume we start from zero. Must have function, method, and bracket defined to use function
-    solution = root_scalar(function,method = 'bisect',bracket = [0,ArithmeticErrornoload_speed])
+    solution = root_scalar(function,method = 'bisect',bracket = [0,noload_speed])
     v_max[i] = (solution.root * wheel_radius) / gear_ratio
 
 #Graph
 plt.plot(Crr_array,v_max)
 plt.xlabel("Rolling Resistance Coeff")
 plt.ylabel('Max Rover Speed [m/s]')
-plt.show()
+#plt.show()

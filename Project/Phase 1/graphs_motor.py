@@ -29,4 +29,4 @@ xlabel('Motor Shaft Speed [rad/s]')
 ylabel('Motor Power [W]')
 
 # If you need to see graphs for report
-# show()
+show()
