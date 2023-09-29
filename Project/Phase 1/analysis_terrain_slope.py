@@ -31,9 +31,10 @@ for i in range(len(v_max)):
     
 #Produce Graphs#
 plt.plot(slope_array_deg,v_max)
-plt.xlabel("Terrain Slope [degress]")
-plt.ylabel("Rover Maximum Velocity [m/s^2]")
-plt.title("Terrain Slope [deg] vs. Rover Maximum Velocity [m/s^2]")
+plt.xlabel("Terrain Angle [deg]")
+plt.ylabel("Max Rover Speed [m/s]")
+plt.title("Terrain Angle [deg] vs. Max Rover Speed [m/s]")
 plt.show()
+
 
 
