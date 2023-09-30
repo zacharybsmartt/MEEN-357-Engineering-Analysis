@@ -183,14 +183,14 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
             
     return Fnet
 
-#Check Outputs
-# print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
-# print(F_drive(1,rover)) ###SHOULD EQUAL 7672
-# print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
-# #Below Function Run correctly
-# print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
-# print(get_mass(rover)) #check step
-# print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
+# Check Outputs
+print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
+print(F_drive(1,rover)) ###SHOULD EQUAL 7672
+print(F_net(1,5,rover,planet,0.1)) ###SHOULD EQUAL 7069###
+#Below Function Run correctly
+print(F_rolling(1,5,rover,planet,0.1)) ###SHOULD EQUAL -322###
+print(get_mass(rover)) #check step
+print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
 
 
 # #check for vector output

@@ -53,5 +53,5 @@ ax.set_xlabel('Resistance Crr')
 ax.set_ylabel("Terrain ANgle [deg]")
 ax.set_title("Max Rover Speed vs. Terrain angles vs. Rolling Resistances")
 ax.set_zlabel('Max Rover Speed [m/s]')
-plt.show()
+# plt.show()
 
