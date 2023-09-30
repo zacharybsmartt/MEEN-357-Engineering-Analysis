@@ -157,8 +157,9 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     #This function computes the total force (N) acting on the rover in the direction of its motion
-    ####WHAT ABOUT SAME SIZE?####
     ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
+    if np.ndim(omega) != 0 and np.ndim(omega) != 1:
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
     if not isinstance(planet,dict) or not isinstance(rover,dict):
         raise Exception("The third or fourth inputs are not dictionaries.")
     if not np.isscalar(Crr) or Crr < 0:
