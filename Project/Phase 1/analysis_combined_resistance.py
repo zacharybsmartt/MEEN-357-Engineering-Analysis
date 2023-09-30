@@ -11,7 +11,7 @@ from scipy.optimize import root_scalar
 
 #retrieve rover and planet values
 rover, planet = rover()
-gear_raio = get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
+gear_ratio = get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
 wheel_radius = rover['wheel_assembly']['wheel']['radius']
 #Create necessary Crr array
 Crr_array = np.linspace(0.01,0.4,25)
@@ -38,15 +38,17 @@ for i in range(N):
         function = lambda omega: F_net(omega,slope_sample,rover,planet,Crr_sample)
         try:
             solution = root_scalar(function,method = 'bisect', bracket = [0,noload_speed])
+            VMAX[i,j] = (solution.root * wheel_radius) / gear_ratio
         except ValueError:
             VMAX[i,j] = np.nan
         #if VMAX[i,j] != np.nan:
             #VMAX[i,j] = (solution.root * wheel_radius) / gear_ratio
-        VMAX[i,j] = (solution.root * wheel_radius) / gear_ratio
         
 ####GRAPHING####
 fig, ax = plt.subplots(subplot_kw={'projection' : '3d'})
 surf = ax.plot_surface(CRR, SLOPE, VMAX)
+ax.elev = 20
+ax.azim = 50
 ax.set_xlabel('Resistance Crr')
 ax.set_ylabel("Terrain ANgle [deg]")
 ax.set_title("Max Rover Speed vs. Terrain angles vs. Rolling Resistances")
