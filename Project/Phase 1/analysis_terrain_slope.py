@@ -30,7 +30,7 @@ plt.plot(slope_array_deg,v_max)
 plt.xlabel("Terrain Angle [deg]")
 plt.ylabel("Max Rover Speed [m/s]")
 plt.title("Terrain Angle [deg] vs. Max Rover Speed [m/s]")
-#plt.show()
+plt.show()
 
 
 
