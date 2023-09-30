@@ -45,10 +45,11 @@ for i in range(N):
         VMAX[i,j] = (solution.root * wheel_radius) / gear_ratio
         
 ####GRAPHING####
-fig, ax = plt.subplots(subplot_kw={'projection' : '3d'})
-surf = ax.plot_surface(CRR, SLOPE, VMAX)
+figure = matplotlib.pyplot.figure()
+ax = Axes3D(figure, elev = 25, azim =25) # where N1 and N2
+ax.plot_surface(CRR, SLOPE, VMAX)
 ax.set_xlabel('Resistance Crr')
-ax.set_ylabel("Terrain ANgle [deg]")
+ax.set_ylabel("Terrain Angle [deg]")
 ax.set_title("Max Rover Speed vs. Terrain angles vs. Rolling Resistances")
 ax.set_zlabel('Max Rover Speed [m/s]')
 #plt.show()
