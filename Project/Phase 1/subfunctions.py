@@ -129,7 +129,8 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
     if not (isNumeric := isinstance(omega, (np.float64, np.intc, int, float))) and not isinstance(omega, np.ndarray):
         raise Exception('The parameter `omega` must be a scalar value or array.')
-
+    if np.ndim(terrain_angle) != 0 and np.ndim(terrain_angle) != 1:
+         raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
     if (isNumeric and not isinstance(terrain_angle, (np.float64, np.intc, int, float))) or not isNumeric and not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
         raise Exception('The parameter `terrain_angle` must match the type of omega.')
     
@@ -162,6 +163,8 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     ####WHAT ABOUT SAME SIZE?####
     ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+    if np.ndim(terrain_angle) != 0 and np.ndim(terrain_angle) != 1:
         raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
     if not isinstance(planet,dict) or not isinstance(rover,dict):
         raise Exception("The third or fourth inputs are not dictionaries.")
