@@ -76,6 +76,8 @@ def tau_dcmotor(omega, motor):
 
 
 def F_drive(omega, rover):
+    if np.ndim(omega) != 0 and np.ndim(omega) != 1:
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
     if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, int, float, list)):
         raise Exception('The argument `omega` must be a scalar value or a vector of scalars.')
     if isinstance(omega, (list, np.ndarray)):
@@ -96,9 +98,10 @@ def F_drive(omega, rover):
     Fd = 6*torqueOutput / wheelAssembly['wheel']['radius'] #find the drive force of the wheel by taking the output torque and applying it to the wheel.
     return Fd
 
-
 def F_gravity(terrain_angle, rover, planet):
     #check the parameters
+    if np.ndim(terrain_angle) != 0 and np.ndim(terrain_angle) != 1:
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
     if not isinstance(terrain_angle, (int, float, np.float64, np.intc, np.double, np.ndarray, list)):
         raise Exception('The argument `terrain_angle` must be a scalar value or a vector of scalars.')
     if isinstance(terrain_angle, (list, np.ndarray)) and not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]): # confirm that all angles are between -75 and 75 degrees
@@ -121,7 +124,6 @@ def F_gravity(terrain_angle, rover, planet):
         return float(Fgt[0])
     
     return Fgt #observe the sign conventions.
-
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
@@ -157,6 +159,7 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     #This function computes the total force (N) acting on the rover in the direction of its motion
+    ####WHAT ABOUT SAME SIZE?####
     ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
         raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
