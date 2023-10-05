@@ -31,5 +31,5 @@ for i in range(len(v_max)):
 plt.plot(Crr_array,v_max)
 plt.xlabel("Rolling Resistance Coeff")
 plt.ylabel('Max Rover Speed [m/s]')
-# plt.show()
+plt.show()
 # Done
