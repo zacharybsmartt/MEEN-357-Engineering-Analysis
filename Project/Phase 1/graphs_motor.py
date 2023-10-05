@@ -1,4 +1,4 @@
-from matplotlib.pyplot import plot, xlabel, ylabel, subplot, show, figure
+from matplotlib.pyplot import plot, xlabel, ylabel, subplot, show
 from define_rover import *
 from subfunctions import tau_dcmotor
 from numpy import linspace, zeros, multiply
@@ -11,7 +11,7 @@ tau = zeros(len(omega))
 
 for w in range(len(omega)):   
     tau[w] = tau_dcmotor(omega[w], rover['wheel_assembly']['motor'])
-figure(figsize=(8,6.5))
+
 subplot(3,1,1)
 plot(tau,omega)
 xlabel('Motor Shaft Torque [Nm]')
@@ -30,3 +30,4 @@ ylabel('Motor Power [W]')
 
 # If you need to see graphs for report
 show()
+# Done
