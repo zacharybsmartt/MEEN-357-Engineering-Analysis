@@ -6,6 +6,7 @@ import numpy as np
 rover, planet = rover() # rover call to define all our variables
 degToRad = lambda deg: deg * np.pi / 180
 
+
 def get_mass(rover):
     """
     This function computes rover mass in kilograms. It accounts for the chassis, power subsystem, science payload,
@@ -49,7 +50,7 @@ def tau_dcmotor(omega, motor):
     """
     # Check all inputs!!!
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
-        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matrices are allowed')
     
     elif type(rover) != dict:
         raise Exception('Rover properties must be a dictionary')
@@ -77,7 +78,7 @@ def tau_dcmotor(omega, motor):
 
 def F_drive(omega, rover):
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
-        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matrices are allowed')
     if not isinstance(omega, (np.float64, np.intc, np.double, np.ndarray, int, float, list)):
         raise Exception('The argument `omega` must be a scalar value or a vector of scalars.')
     if isinstance(omega, (list, np.ndarray)):
@@ -98,10 +99,11 @@ def F_drive(omega, rover):
     Fd = 6*torqueOutput / wheelAssembly['wheel']['radius'] #find the drive force of the wheel by taking the output torque and applying it to the wheel.
     return Fd
 
+
 def F_gravity(terrain_angle, rover, planet):
     #check the parameters
     if np.ndim(terrain_angle) != 0 and np.ndim(terrain_angle) != 1:
-        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matrices are allowed')
     if not isinstance(terrain_angle, (int, float, np.float64, np.intc, np.double, np.ndarray, list)):
         raise Exception('The argument `terrain_angle` must be a scalar value or a vector of scalars.')
     if isinstance(terrain_angle, (list, np.ndarray)) and not all([float(ang) >= -75 and float(ang) <= 75 for ang in terrain_angle]): # confirm that all angles are between -75 and 75 degrees
@@ -125,12 +127,13 @@ def F_gravity(terrain_angle, rover, planet):
     
     return Fgt #observe the sign conventions.
 
+
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
     if not (isNumeric := isinstance(omega, (np.float64, np.intc, int, float))) and not isinstance(omega, np.ndarray):
         raise Exception('The parameter `omega` must be a scalar value or array.')
     if np.ndim(terrain_angle) != 0 and np.ndim(terrain_angle) != 1:
-         raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+         raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matrices are allowed')
     if (isNumeric and not isinstance(terrain_angle, (np.float64, np.intc, int, float))) or not isNumeric and not (isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray)):
         raise Exception('The parameter `terrain_angle` must match the type of omega.')
     
@@ -158,14 +161,15 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     Frr =  -erfValue * Crr * roverMass * planetGravity * np.cos(degToRad(terrain_angle))
     return Frr
 
+
 def F_net(omega, terrain_angle, rover, planet, Crr):
     #This function computes the total force (N) acting on the rover in the direction of its motion
     ####WHAT ABOUT SAME SIZE?####
     ####CHECKING CONDITIONS & EVALUATING FOR Fnet####
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
-        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matrices are allowed')
     if np.ndim(terrain_angle) != 0 and np.ndim(terrain_angle) != 1:
-        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matricies are allowed')
+        raise Exception('omega (Motor shaft speed) must be a scalar or 1D numpy array. No matrices are allowed')
     if not isinstance(planet,dict) or not isinstance(rover,dict):
         raise Exception("The third or fourth inputs are not dictionaries.")
     if not np.isscalar(Crr) or Crr < 0:
