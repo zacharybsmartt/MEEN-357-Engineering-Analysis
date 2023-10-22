@@ -289,6 +289,30 @@ def battenergy(t, v, rover):
     run batteries to zero capacity and other losses exist that are not
     modeled in this project.
     """
+    if not isinstance(t, np.ndarray) or not isinstance(v, np.ndarray):
+        raise Exception('The time samples and or velocity samples parameters must be a numpy vector.')
+    #safety check for vectors
+    if len(t) != len(v):
+        raise Exception('The time samples vector, `t`, is not equal in length to the velocity samples vector, `v`.')
+    if isinstance(rover, dict):
+        raise Exception('The parameter `rover` is not a dictionary type.')
+    
+    #pmotor = efficiencyTauT * power
+    wheelAssembly = 'wheel_assembly'
+    speedReducer = 'speed_reducer'
+    powerMotor = mechpower(v, rover)
+    omegaWheel = v/rover[wheelAssembly]['wheel']['radius']
+    omegaShaft = omegaWheel*get_gear_ratio(rover[wheelAssembly][speedReducer])
+    torqueShaft = tau_dcmotor(omegaShaft, rover[wheelAssembly]['motor']) #should be same length as t and v.
+
+    efficiencyForTorqueShafts = interp1d(rover[wheelAssembly]['motor']['effcy_tau'], rover[wheelAssembly]['motor']['effcy'], kind = 'cubic')(torqueShaft) # should be same length as t and v
+
+    #integration here using trapezoid areas.
+    area = 0.0
+    for i in range(1, len(t)):
+        deltaT = t[i] - t[i-1]
+        area += (powerMotor[i]/efficiencyForTorqueShafts[i] + powerMotor[i-1]/efficiencyForTorqueShafts[i-1]) * deltaT / 2
+    E = area
     return E
 
 
