@@ -316,8 +316,85 @@ def battenergy(t, v, rover):
     return E
 
 
+def end_of_mission_event(end_event):
+    """
+    Defines an event that terminates the mission simulation. Mission is over
+    when rover reaches a certain distance, has moved for a maximum simulation 
+    time or has reached a minimum velocity.            
+    """
+    
+    mission_distance = end_event['max_distance']
+    mission_max_time = end_event['max_time']
+    mission_min_velocity = end_event['min_velocity']
+    
+    # Assume that y[1] is the distance traveled
+    distance_left = lambda t,y: mission_distance - y[1]
+    distance_left.terminal = True
+    
+    time_left = lambda t,y: mission_max_time - t
+    time_left.terminal = True
+    
+    velocity_threshold = lambda t,y: y[0] - mission_min_velocity;
+    velocity_threshold.terminal = True
+    velocity_threshold.direction = -1
+    
+    # terminal indicates whether any of the conditions can lead to the
+    # termination of the ODE solver. In this case all conditions can terminate
+    # the simulation independently.
+    
+    # direction indicates whether the direction along which the different
+    # conditions is reached matters or does not matter. In this case, only
+    # the direction in which the velocity treshold is arrived at matters
+    # (negative)
+    
+    events = [distance_left, time_left, velocity_threshold]
+    
+    return events
 
 
+def simulate_rover(rover, planet, experiment, end_event):
+    """
+    This function integrates the trajectory of a rover.
+    """
+    from scipy import integrate
+    if type(rover) != dict:
+        raise Exception("The first input must be a dictionary.")
+    if type(planet) != dict:
+        raise Exception("The second input must be a dictionary.")
+    if type(experiment) != dict:
+        raise Exception("The third input must be a dictionary")
+    if type(end_event) != dict:
+        raise Exception("The fourth input must be a dictionary.")
+        
+    def terrain_function(t,y):
+        rover_dynamics(t,y,rover,planet,experiment)
+        
+    #solution = integrate.solve_ivp(terrain_function, np.array([experiment['time_range'][0],end_event['max_time']]),experiment['initial_conditions'],method = 'BDF', events = end_of_mission_event(end_event))
+    solution = integrate.solve_ivp(terrain_function,t,y,method = 'RK45',events = events)
+    vel_avg = np.average(solution.y[0])
+    distance = solution.y[1][len(solution.y[1])-1]
+    inst_pwr = mechpower(solution.y[0],rover)
+    battery_energy_sol = battenergy(solution.t,solution.y[0],rover)
+    energy_per_dist = battery_energy_sol/distance
+    T = solution.t
+    total_distance = np.average(solution.y[0,:])*T[-1]
+    #Telemetry Dictionary
+    rover["telemetry"] = {
+                          "Time": T,
+                          "completion_time": T[-1],
+                          "velocity": solution.y[0],
+                          "position": solution.y[1],
+                          "distance_traveled": total_distance,
+                          "max_velocity": np.max(solution.y[0]),
+                          "average_velocity": vel_avg,
+                          "power": inst_pwr,
+                          "battery_energy": battery_energy_sol,
+                          "energy_per_distance": energy_per_dist,
+                              }
+              
+    
+    
+    return rover
 
 
 # Test code below
