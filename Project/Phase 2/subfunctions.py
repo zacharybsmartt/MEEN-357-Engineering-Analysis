@@ -206,12 +206,32 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 def motorW(v, rover):
     """
     Compute the rotational speed of the motor shaft [rad/s] given the
-translational velocity of the rover and the rover
+    translational velocity of the rover and the rover
     dictionary.
     This function should be “vectorized” such that if given a vector
-of rover velocities it returns a vector the same size
+    of rover velocities it returns a vector the same size
     containing the corresponding motor speeds.
     """
+    is_not_float = False
+    radius = float(rover['wheel_assembly']['wheel']['radius'])
+    omega = []
+
+    if type(rover) != dict:
+        raise Exception(" 'rover' must be a dictionary")
+    if type(v) != int and type(v) != float:
+        is_not_float = True
+    if isinstance(v, np.ndarray) == False and is_not_float == False:
+        raise Exception("Your first input must be a real number or a numpy array of real numbers")
+    
+    if type(v) == float:
+        w = v / radius
+
+    else:
+        for i in v:
+            b = i / radius
+            omega.append(b)
+
+        w = np.array(omega)
 
     return w
 
@@ -219,40 +239,44 @@ of rover velocities it returns a vector the same size
 def rover_dynamics(t, y, rover, planet, experiment):
     """
     This function computes the derivative of the state vector (state
-vector is: [velocity, position]) for the rover given its
+    vector is: [velocity, position]) for the rover given its
     current state. It requires rover and experiment dictionary input
-parameters. It is intended to be passed to an ODE
+    parameters. It is intended to be passed to an ODE
     solver.
     """
-
+    if type(rover) != dict:
+        raise Exception(" 'rover' must be a dictionary")
+    
+    
     return dydt
 
 
 def mechpower(v, rover):
     """
     This function computes the instantaneous mechanical power output
-by a single DC motor at each point in a given
+    by a single DC motor at each point in a given
     velocity profile.
     """
-
+    
     return P
 
 
 def battenergy(t, v, rover):
     """
     This function computes the total electrical energy consumed from
-the rover battery pack over a simulation profile,
+    the rover battery pack over a simulation profile,
     defined as time-velocity pairs. This function assumes all 6 motors
-are driven from the same battery pack (i.e., this
+    are driven from the same battery pack (i.e., this
     function accounts for energy consumed by all motors).
     This function accounts for the inefficiencies of transforming
-electrical energy to mechanical energy using a DC
+    electrical energy to mechanical energy using a DC
     motor.
     In practice, the result given by this function will be a lower
-bound on energy requirements since it is undesirable to
+    bound on energy requirements since it is undesirable to
     run batteries to zero capacity and other losses exist that are not
-modeled in this project.
+    modeled in this project.
     """
+    
     return E
 
 
