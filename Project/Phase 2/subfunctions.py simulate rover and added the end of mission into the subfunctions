@@ -316,12 +316,7 @@ def battenergy(t, v, rover):
     return E
 
 
-def simulate_rover(rover, planet, experiment, end_event):
-    """
-    This function integrates the trajectory of a rover.
-    """
 
-    return rover
 
 
 
