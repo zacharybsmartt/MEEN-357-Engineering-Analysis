@@ -3,6 +3,7 @@
 
 
 def rover():
+    from numpy import array
     """
     Defines the rover, units for everything follow
     m, kg, Nm, rad/s, and m/s^2.
@@ -24,9 +25,11 @@ def rover():
         'torque_stall':170,
         'torque_noload':0,
         'speed_noload':3.8,
-        'mass':5
+        'mass':5,
+        'effcy_tau': array([0,10,20,40,70,165]),
+        'effcy': array([0,0.55,0.75,0.71,0.50,0.05])
     }
-
+    
     wheel_assembly = {
         'wheel':wheel,
         'speed_reducer':speed_reducer,
