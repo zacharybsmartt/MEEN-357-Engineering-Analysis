@@ -35,7 +35,7 @@ def get_gear_ratio(speed_reducer): # should be good, just follows the formula gi
     """
     This function computes the gear ratio of the speed reducer.
     In later project phases, you will extend this to work for various
-types of speed reducers. For now, it needs to work
+    types of speed reducers. For now, it needs to work
     only with the simple reverted gear set described in Section 2.2
     """
     if type(speed_reducer) is not dict:
@@ -53,13 +53,13 @@ types of speed reducers. For now, it needs to work
 def tau_dcmotor(omega, motor):
     """
     This function returns the motor shaft torque in Nm given the shaft
-speed in rad/s and the motor specifications
+    speed in rad/s and the motor specifications
     structure (which defines the no-load speed, no-load torque, and
-stall speed, among other things.
+    stall speed, among other things.
     This function must operate in a “vectorized” manner, meaning that
-if given a vector of motor shaft speeds, it
+    if given a vector of motor shaft speeds, it
     returns a vector of the same size consisting of the corresponding
-motor shaft torques.
+    motor shaft torques.
     """
     # Check all inputs!!!
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
@@ -206,12 +206,32 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 def motorW(v, rover):
     """
     Compute the rotational speed of the motor shaft [rad/s] given the
-translational velocity of the rover and the rover
+    translational velocity of the rover and the rover
     dictionary.
     This function should be “vectorized” such that if given a vector
-of rover velocities it returns a vector the same size
+    of rover velocities it returns a vector the same size
     containing the corresponding motor speeds.
     """
+    is_not_float = False
+    radius = float(rover['wheel_assembly']['wheel']['radius'])
+    omega = []
+
+    if type(rover) != dict:
+        raise Exception(" 'rover' must be a dictionary")
+    if type(v) != int and type(v) != float:
+        is_not_float = True
+    if isinstance(v, np.ndarray) == False and is_not_float == False:
+        raise Exception("Your first input must be a real number or a numpy array of real numbers")
+    
+    if type(v) == float:
+        w = v / radius
+
+    else:
+        for i in v:
+            b = i / radius
+            omega.append(b)
+
+        w = np.array(omega)
 
     return w
 
@@ -219,11 +239,27 @@ of rover velocities it returns a vector the same size
 def rover_dynamics(t, y, rover, planet, experiment):
     """
     This function computes the derivative of the state vector (state
-vector is: [velocity, position]) for the rover given its
+    vector is: [velocity, position]) for the rover given its
     current state. It requires rover and experiment dictionary input
-parameters. It is intended to be passed to an ODE
+    parameters. It is intended to be passed to an ODE
     solver.
     """
+    if not isinstance(rover, dict):
+        raise Exception("'rover' must be a dictionary")
+    if not (isinstance(t, (int, float)) and isinstance(y, np.ndarray)):
+        raise Exception("'t' must be a scalar value, and 'y' must be a 1D numpy array")
+    if not isinstance(planet, dict):
+        raise Exception("'planet' must be a dictionary")
+    if not isinstance(experiment, dict):
+        raise Exception("'experiment' must be a dictionary")
+
+    alpha_dist = experiment['alpha_dist']
+    velocity = float(y[0])
+    alpha_fun = interp1d(alpha_dist, experiment['alpha_deg'], kind='cubic', fill_value='extrapolate')
+    terrain_angle = float(alpha_fun(y[1]))
+    o = motorW(velocity, rover)
+    accel = F_net(o, terrain_angle, rover, planet, 0.1) / get_mass(rover)
+    dydt = np.array([round(accel, 4), y[0]])
 
     return dydt
 
@@ -231,52 +267,28 @@ parameters. It is intended to be passed to an ODE
 def mechpower(v, rover):
     """
     This function computes the instantaneous mechanical power output
-by a single DC motor at each point in a given
+    by a single DC motor at each point in a given
     velocity profile.
     """
-
+    
     return P
 
 
 def battenergy(t, v, rover):
     """
     This function computes the total electrical energy consumed from
-the rover battery pack over a simulation profile,
+    the rover battery pack over a simulation profile,
     defined as time-velocity pairs. This function assumes all 6 motors
-are driven from the same battery pack (i.e., this
+    are driven from the same battery pack (i.e., this
     function accounts for energy consumed by all motors).
     This function accounts for the inefficiencies of transforming
-electrical energy to mechanical energy using a DC
+    electrical energy to mechanical energy using a DC
     motor.
     In practice, the result given by this function will be a lower
-bound on energy requirements since it is undesirable to
+    bound on energy requirements since it is undesirable to
     run batteries to zero capacity and other losses exist that are not
-modeled in this project.
+    modeled in this project.
     """
-    if not isinstance(t, np.ndarray) or not isinstance(v, np.ndarray):
-        raise Exception('The time samples and or velocity samples parameters must be a numpy vector.')
-    #safety check for vectors
-    if len(t) != len(v):
-        raise Exception('The time samples vector, `t`, is not equal in length to the velocity samples vector, `v`.')
-    if isinstance(rover, dict):
-        raise Exception('The parameter `rover` is not a dictionary type.')
-    
-    #pmotor = efficiencyTauT * power
-    wheelAssembly = 'wheel_assembly'
-    speedReducer = 'speed_reducer'
-    powerMotor = mechpower(v, rover)
-    omegaWheel = v/rover[wheelAssembly]['wheel']['radius']
-    omegaShaft = omegaWheel*get_gear_ratio(rover[wheelAssembly][speedReducer])
-    torqueShaft = tau_dcmotor(omegaShaft, rover[wheelAssembly]['motor']) #should be same length as t and v.
-
-    efficiencyForTorqueShafts = interp1d(rover[wheelAssembly]['motor']['effcy_tau'], rover[wheelAssembly]['motor']['effcy'], kind = 'cubic')(torqueShaft) # should be same length as t and v
-
-    #integration here using trapezoid areas.
-    area = 0.0
-    for i in range(1, len(t)):
-        deltaT = t[i] - t[i-1]
-        area += (powerMotor[i]/efficiencyForTorqueShafts[i] + powerMotor[i-1]/efficiencyForTorqueShafts[i-1]) * deltaT / 2
-    E = area
     return E
 
 

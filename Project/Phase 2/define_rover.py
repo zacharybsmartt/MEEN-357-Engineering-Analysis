@@ -44,6 +44,19 @@ def rover():
 
     planet = {'g':3.72}
 
+    telemetry = {
+        'Time':[],
+        'completion_time':0,
+        'velocity':[],
+        'position':[],
+        'distane_traveled':0,
+        'max_velocity':0,
+        'average_velocity':0,
+        'power':[],
+        'battery_energy':0,
+        'energy_per_distance':0
+    }
+
     rover = {
         'wheel_assembly':wheel_assembly,
         'chassis':chassis,
