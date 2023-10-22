@@ -1,7 +1,7 @@
 from math import *
 from define_rover import *
 import numpy as np
-
+from scipy.interpolate import interp1d
 
 #-----------------------------------------------------
 #UPDATES FOR TASK 2: CODE MUST NOT BE THOROUGHLY COMMENTED!!
@@ -35,7 +35,7 @@ def get_gear_ratio(speed_reducer): # should be good, just follows the formula gi
     """
     This function computes the gear ratio of the speed reducer.
     In later project phases, you will extend this to work for various
-types of speed reducers. For now, it needs to work
+    types of speed reducers. For now, it needs to work
     only with the simple reverted gear set described in Section 2.2
     """
     if type(speed_reducer) is not dict:
@@ -53,13 +53,13 @@ types of speed reducers. For now, it needs to work
 def tau_dcmotor(omega, motor):
     """
     This function returns the motor shaft torque in Nm given the shaft
-speed in rad/s and the motor specifications
+    speed in rad/s and the motor specifications
     structure (which defines the no-load speed, no-load torque, and
-stall speed, among other things.
+    stall speed, among other things.
     This function must operate in a “vectorized” manner, meaning that
-if given a vector of motor shaft speeds, it
+    if given a vector of motor shaft speeds, it
     returns a vector of the same size consisting of the corresponding
-motor shaft torques.
+    motor shaft torques.
     """
     # Check all inputs!!!
     if np.ndim(omega) != 0 and np.ndim(omega) != 1:
@@ -244,10 +244,23 @@ def rover_dynamics(t, y, rover, planet, experiment):
     parameters. It is intended to be passed to an ODE
     solver.
     """
-    if type(rover) != dict:
-        raise Exception(" 'rover' must be a dictionary")
-    
-    
+    if not isinstance(rover, dict):
+        raise Exception("'rover' must be a dictionary")
+    if not (isinstance(t, (int, float)) and isinstance(y, np.ndarray)):
+        raise Exception("'t' must be a scalar value, and 'y' must be a 1D numpy array")
+    if not isinstance(planet, dict):
+        raise Exception("'planet' must be a dictionary")
+    if not isinstance(experiment, dict):
+        raise Exception("'experiment' must be a dictionary")
+
+    alpha_dist = experiment['alpha_dist']
+    velocity = float(y[0])
+    alpha_fun = interp1d(alpha_dist, experiment['alpha_deg'], kind='cubic', fill_value='extrapolate')
+    terrain_angle = float(alpha_fun(y[1]))
+    o = motorW(velocity, rover)
+    accel = F_net(o, terrain_angle, rover, planet, 0.1) / get_mass(rover)
+    dydt = np.array([round(accel, 4), y[0]])
+
     return dydt
 
 
