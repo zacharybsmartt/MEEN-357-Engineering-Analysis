@@ -1,6 +1,7 @@
 from math import *
 from define_rover import *
 import numpy as np
+import define_rover
 from scipy.interpolate import interp1d
 
 #-----------------------------------------------------
@@ -11,6 +12,7 @@ from scipy.interpolate import interp1d
 
 # save space above for imports if need be
 rover, planet = rover() # rover call to define all our variables
+experiment, end_event = experiment1()
 degToRad = lambda deg: deg * np.pi / 180
 
 
