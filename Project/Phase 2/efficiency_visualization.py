@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#from define_experiment import*
-#from define_rover import*
+from define_experiment import*
+from define_rover import*
 from scipy.interpolate import*
 
 
