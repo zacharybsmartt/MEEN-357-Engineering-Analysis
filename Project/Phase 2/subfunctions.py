@@ -276,7 +276,20 @@ def mechpower(v, rover):
     by a single DC motor at each point in a given
     velocity profile.
     """
+    if not np.isscalar(v) and not (isinstance(v, np.ndarray) and not v.ndim == 1):
+        raise Exception('Velocity parameter `v` must be a scalar or 1d array.')
+    if isinstance(v, np.ndarray) and not all([np.isscalar(i) for i in v]):
+        raise Exception('Velocity parameter `v` must contain scalars only.')
+    if not isinstance(rover, dict):
+        raise Exception('The parameter `rover` is not a dictionary type.')
     
+    omegaWheel = v/rover['wheel_assembly']['wheel']['radius']
+    omegaMotor = get_gear_ratio(rover['wheel_assembly']['speed_reducer'])*omegaWheel
+
+    torqueMotor = tau_dcmotor(omegaMotor, rover['wheel_assembly']['motor'])
+    P = torqueMotor*omegaMotor
+
+
     return P
 
 
@@ -300,7 +313,7 @@ def battenergy(t, v, rover):
     #safety check for vectors
     if len(t) != len(v):
         raise Exception('The time samples vector, `t`, is not equal in length to the velocity samples vector, `v`.')
-    if isinstance(rover, dict):
+    if not isinstance(rover, dict):
         raise Exception('The parameter `rover` is not a dictionary type.')
     
     #pmotor = efficiencyTauT * power
@@ -317,7 +330,7 @@ def battenergy(t, v, rover):
     area = 0.0
     for i in range(1, len(t)):
         deltaT = t[i] - t[i-1]
-        area += (powerMotor[i]/efficiencyForTorqueShafts[i] + powerMotor[i-1]/efficiencyForTorqueShafts[i-1]) * deltaT / 2
+        area += 6*(powerMotor[i]/efficiencyForTorqueShafts[i] + powerMotor[i-1]/efficiencyForTorqueShafts[i-1]) * deltaT / 2 #multiply by 6 to account for all motors
     E = area
 
     return E
