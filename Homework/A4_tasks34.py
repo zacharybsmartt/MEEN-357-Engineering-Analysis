@@ -3,6 +3,7 @@ from math import *
 import matplotlib.pyplot as plt
 from A4_task2 import rk4th
 
+# below is task 3
 # Define the second-order differential equation
 def secondderiv(y, x):
     return np.array([y[1], -0.5 * y[1] - 7 * y[0]])
@@ -36,4 +37,35 @@ axs[1].plot(x, sol[:, 0])
 axs[1].set_xlabel('x')
 axs[1].set_ylabel('y')
 
+plt.show()
+
+
+# below is task 4
+# True solution at x = 2 with h = (0.5)^20
+true_solution = np.array([0.0009765625, 0.0001220703125])
+
+# List of step sizes
+p_values = [1, 2, 3, 4, 5, 6, 7]
+
+# Lists to store errors
+errors_y = []
+errors_dydx = []
+
+for p in p_values:
+    h = 0.5 ** p
+    sol, x = solve_differential_eq(rk4th, y0, h, secondderiv)
+    error_y = abs(sol[-1, 0] - true_solution[0])
+    error_dydx = abs(sol[-1, 1] - true_solution[1])
+    errors_y.append(error_y)
+    errors_dydx.append(error_dydx)
+
+# Plot the true error for each state variable at x = 2 as a function of h (log-log scale)
+plt.figure()
+plt.loglog(0.5**np.array(p_values), errors_y, marker='o', label='Error in y')
+plt.loglog(0.5**np.array(p_values), errors_dydx, marker='o', label='Error in dy/dx')
+plt.xlabel('Step Size (log scale)')
+plt.ylabel('True Error (log scale)')
+plt.title('True Error vs. Step Size (log-log scale)')
+plt.legend()
+plt.grid(True)
 plt.show()
