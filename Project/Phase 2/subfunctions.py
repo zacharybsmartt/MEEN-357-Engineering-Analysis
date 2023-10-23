@@ -364,13 +364,13 @@ def simulate_rover(rover, planet, experiment, end_event):
     This function integrates the trajectory of a rover.
     """
     from scipy import integrate
-    if type(rover) != dict:
+    if not isinstance(rover,dict):
         raise Exception("The first input must be a dictionary.")
-    if type(planet) != dict:
+    if not isinstance(planet,dict):
         raise Exception("The second input must be a dictionary.")
-    if type(experiment) != dict:
+    if not isinstance(experiment,dict):
         raise Exception("The third input must be a dictionary")
-    if type(end_event) != dict:
+    if not isinstance(end_event,dict):
         raise Exception("The fourth input must be a dictionary.")
         
     def terrain_function(t,y):
