@@ -13,6 +13,7 @@ from scipy.interpolate import interp1d
 rover, planet = rover() # rover call to define all our variables
 degToRad = lambda deg: deg * np.pi / 180
 
+
 def get_mass(rover):
     """
     This function computes rover mass in kilograms. It accounts for
@@ -112,7 +113,9 @@ np.ndarray, int, float, list)):
     torqueOutput = torqueInput*gearRatio #perform a transformation over the speed reducer given by the gear ratio.
     #print('torque:',torqueInput, 'gear:', gearRatio)
     Fd = 6*torqueOutput / wheelAssembly['wheel']['radius'] #find the drive force of the wheel by taking the output torque and applying it to the wheel.
+
     return Fd
+
 
 def F_gravity(terrain_angle, rover, planet):
     #check the parameters
@@ -140,6 +143,7 @@ def F_gravity(terrain_angle, rover, planet):
         return float(Fgt[0])
 
     return Fgt #observe the sign conventions.
+
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # type validation of omega and terrain_angle
@@ -172,7 +176,9 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     elif np.isscalar(roverVelocity):
         erfValue = erf(40*roverVelocity)
     Frr =  -erfValue * Crr * roverMass * planetGravity *np.cos(degToRad(terrain_angle))
+
     return Frr
+
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     #This function computes the total force (N) acting on the rover in the direction of its motion
@@ -313,6 +319,7 @@ def battenergy(t, v, rover):
         deltaT = t[i] - t[i-1]
         area += (powerMotor[i]/efficiencyForTorqueShafts[i] + powerMotor[i-1]/efficiencyForTorqueShafts[i-1]) * deltaT / 2
     E = area
+
     return E
 
 
@@ -391,9 +398,7 @@ def simulate_rover(rover, planet, experiment, end_event):
                           "battery_energy": battery_energy_sol,
                           "energy_per_distance": energy_per_dist,
                               }
-              
-    
-    
+
     return rover
 
 
