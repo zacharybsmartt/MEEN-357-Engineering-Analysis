@@ -1,10 +1,6 @@
-from scipy.interpolate import *
-from subfunctions import *
-from define_experiment import *
-import matplotlib.pyplot as plt
-from define_rover import *
 import numpy as np
-
+from subfunctions import *
+import matplotlib.pyplot as plt
 
 
 experiment, end_event = experiment1()

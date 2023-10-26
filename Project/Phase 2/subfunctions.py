@@ -1,9 +1,9 @@
 from math import *
 from define_rover import *
 import numpy as np
-import define_rover
+from define_rover import rover
 from scipy.interpolate import interp1d
-
+from define_experiment import *
 #-----------------------------------------------------
 #UPDATES FOR TASK 2: CODE MUST NOT BE THOROUGHLY COMMENTED!!
 # ALL FUNCTIONS MUST HAVE A DOCSTRING!!
