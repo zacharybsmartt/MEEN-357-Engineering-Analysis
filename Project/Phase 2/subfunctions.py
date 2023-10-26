@@ -213,33 +213,37 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
 def motorW(v, rover):
     """
-    Compute the rotational speed of the motor shaft [rad/s] given the
-    translational velocity of the rover and the rover
-    dictionary.
-    This function should be “vectorized” such that if given a vector
-    of rover velocities it returns a vector the same size
-    containing the corresponding motor speeds.
+    Calculate the motor shaft's rotational speed [rad/s] based on the
+    rover's translational velocity and the rover's parameters.
+    This function is designed to be vectorized to handle velocity vectors.
+
+    :param v: Scalar or vector numpy array of rover velocities.
+    :param rover: Dictionary containing rover parameters.
+    :return: Vector of motor speeds with the same size as the input velocity.
     """
-    is_not_float = False
-    radius = float(rover['wheel_assembly']['wheel']['radius'])
-    omega = []
 
-    if type(rover) != dict:
-        raise Exception(" 'rover' must be a dictionary")
-    if type(v) != int and type(v) != float:
-        is_not_float = True
-    if isinstance(v, np.ndarray) == False and is_not_float == False:
-        raise Exception("Your first input must be a real number or a numpy array of real numbers")
-    
-    if type(v) == float:
-        w = v / radius
+    # Check the type of input velocity
+    if (type(v) != int) and (type(v) != float) and (not isinstance(v, (np.ndarray, np.floating, np.integer))):
+        raise Exception('Input velocity must be a scalar or a vector numpy array.')
 
-    else:
-        for i in v:
-            b = i / radius
-            omega.append(b)
+    # Convert a scalar input to a numpy array
+    elif not isinstance(v, np.ndarray):
+        v = np.array([v], dtype=float)
 
-        w = np.array(omega)
+    # Check if the input is a vector
+    elif len(np.shape(v)) != 1:
+        raise Exception('Input velocity must be a scalar or a vector. Matrices are not allowed.')
+
+    # Get gear ratio and wheel radius from rover data
+    gearRatio = rover['wheel_assembly']['speed_reducer']
+    wheelRadius = rover['wheel_assembly']['wheel']['radius']
+
+    # Initialize a zero omega array with the same length as the velocity vector
+    w = np.zeros(len(v))
+
+    # Calculate the motor speed for each element in the velocity vector
+    for i in range(len(v)):
+        w[i] = ((v[i] * gearRatio) / wheelRadius)
 
     return w
 
@@ -392,7 +396,7 @@ def simulate_rover(rover, planet, experiment, end_event):
         rover_dynamics(t,y,rover,planet,experiment)
         
     #solution = integrate.solve_ivp(terrain_function, np.array([experiment['time_range'][0],end_event['max_time']]),experiment['initial_conditions'],method = 'BDF', events = end_of_mission_event(end_event))
-    solution = integrate.solve_ivp(terrain_function,t,y,method = 'RK45',events = events)
+    solution = integrate.solve_ivp(terrain_function,t,y,method = 'BDF',events = events)
     vel_avg = np.average(solution.y[0])
     distance = solution.y[1][len(solution.y[1])-1]
     inst_pwr = mechpower(solution.y[0],rover)
