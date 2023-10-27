@@ -560,13 +560,13 @@ def simulate_rover(rover, planet, experiment, end_event):
         raise Exception("The third input must be a dictionary.")
     if not isinstance(end_event, dict):
         raise Exception("The fourth input must be a dictionary.")
-
-    def terrain_function(t, y):
-        # Calls the rover_dynamics function to compute derivatives
-        rover_dynamics(t, y, rover, planet, experiment)
+    
+    # Calls the rover_dynamics function to compute derivatives
+    terrain_function = lambda t , y : rover_dynamics(t,y,rover,planet,experiment)
 
     # Solve the ODE and capture the solution
-    solution = integrate.solve_ivp(terrain_function, t, y, method='BDF', events=events)
+    solution = integrate.solve_ivp(terrain_function,np.array([experiment['time_range'][0],end_event['max_time']]),experiment['initial_conditions'],method = 'BDF', events = end_of_mission_event(end_event))
+    #solution = integrate.solve_ivp(terrain_function, t, y, method='BDF', events=events)
 
     # Calculate various telemetry metrics
     vel_avg = np.average(solution.y[0])
@@ -575,12 +575,13 @@ def simulate_rover(rover, planet, experiment, end_event):
     battery_energy_sol = battenergy(solution.t, solution.y[0], rover)
     energy_per_dist = battery_energy_sol / distance
     T = solution.t
-    total_distance = np.average(solution.y[0, :]) * T[-1]
+    total_distance = solution.y[1][len(solution.y[1])-1]
+    
 
     # Update the rover dictionary with telemetry data
     rover["telemetry"] = {
         "Time": T,
-        "completion_time": T[-1],
+        "completion_time": T[len(T)-1],
         "velocity": solution.y[0],
         "position": solution.y[1],
         "distance_traveled": total_distance,
