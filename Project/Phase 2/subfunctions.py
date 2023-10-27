@@ -161,10 +161,10 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     
     v_rover = r*omega/Ng
     
-    Fn = np.array([m*g*math.cos(math.radians(x)) for x in terrain_angle],dtype=float) # normal force
+    Fn = np.array([m*g*cos(radians(x)) for x in terrain_angle],dtype=float) # normal force
     Frr_simple = -Crr*Fn # simple rolling resistance
     
-    Frr = np.array([math.erf(40*v_rover[ii]) * Frr_simple[ii] for ii in range(len(v_rover))], dtype = float)
+    Frr = np.array([erf(40*v_rover[ii]) * Frr_simple[ii] for ii in range(len(v_rover))], dtype = float)
     
     return Frr
 
@@ -204,7 +204,7 @@ def F_gravity(terrain_angle, rover, planet):
     m = get_mass(rover)
     g = planet['g']
     
-    Fgt = np.array([-m*g*math.sin(math.radians(x)) for x in terrain_angle], dtype = float)
+    Fgt = np.array([-m*g*sin(radians(x)) for x in terrain_angle], dtype = float)
         
     return Fgt
 
