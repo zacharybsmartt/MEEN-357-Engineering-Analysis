@@ -2,7 +2,6 @@ import numpy as np
 from subfunctions import *
 from define_experiment import*
 import matplotlib.pyplot as plt
-
 #call the experiment1 function provided and assign the returns to experiment and end_event variables
 experiment, end_event = experiment1()
 #update the information for the end_event regarding the maximum time distance and minimum velocity
@@ -37,7 +36,8 @@ axs[2].set(xlabel='Time (s)', ylabel='Power (W)', title='Power vs. Time')
 
 # Task 9 Calculations:
 # Calculate energy consumption and compare with the battery's energy
-energy_consumed = battenergy(times, velos, rover)
+#print(times)
+energy_consumed = battenergy(time, velocity, rover)
 batt1 = 0.9072 * 10**6  # Initial battery energy in joules
 
 print('Energy of Battery (J)', batt1)
