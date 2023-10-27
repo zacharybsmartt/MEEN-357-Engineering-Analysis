@@ -361,7 +361,7 @@ def motorW(v, rover):
 
     # Calculate the motor speed for each element in the velocity vector
     for i in range(len(v)):
-        w[i] = ((v[i] * gearRatio) / wheelRadius)
+        w[i] = ((v[i] * get_gear_ratio(gearRatio)) / wheelRadius)
 
     return w
 
