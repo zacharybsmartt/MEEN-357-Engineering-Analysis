@@ -410,7 +410,7 @@ def rover_dynamics(t, y, rover, planet, experiment):
     accel = F_net(o, terrain_angle, rover, planet, 0.1) / get_mass(rover)
 
     # Create a new state vector with velocity derivative and position
-    dydt = np.array([round(accel, 4), y[0]])
+    dydt = np.array([float(np.round(accel, 2)), y[0]])
 
     return dydt
 
@@ -428,7 +428,7 @@ def mechpower(v, rover):
     """
 
     # Check the type of input velocity
-    if not np.isscalar(v) and not (isinstance(v, np.ndarray) and not v.ndim == 1):
+    if not np.isscalar(v) and not (isinstance(v, np.ndarray) and v.ndim == 1):
         raise Exception('Velocity parameter `v` must be a scalar or 1d array.')
     if isinstance(v, np.ndarray) and not all([np.isscalar(i) for i in v]):
         raise Exception('Velocity parameter `v` must contain scalars only.')
