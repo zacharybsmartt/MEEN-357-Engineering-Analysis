@@ -617,4 +617,10 @@ def simulate_rover(rover, planet, experiment, end_event):
 # print(get_mass(rover)) #check step
 # print(get_gear_ratio(rover['wheel_assembly']['speed_reducer'])) # check step
 # # test for zachary, edit
+
+#check functions
+#print(motorW(0.3,rover))  #should return 3.0625 (correct)
+#print(mechpower(0.3,rover))  #should return 101.04 (correct)
+#print(battenergy(np.array([0,1,2,3,4]),np.array([0.33,0.32,0.33,0.2,0.25]),rover))  #should return around 4000, returned 4280.99644 (correct)
+#print(rover_dynamics(20,np.array([0.25,500]),rover,planet,experiment)) #should return np.array([2.86,0.25]) (correct)
 """
