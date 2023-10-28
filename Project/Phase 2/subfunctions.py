@@ -426,13 +426,15 @@ def mechpower(v, rover):
     float or np.ndarray: The instantaneous mechanical power output corresponding to the input velocity profile.
     """
 
-    # Check the type of input velocity
-    if not np.isscalar(v) and not (isinstance(v, np.ndarray) and v.ndim == 1):
-        raise Exception('Velocity parameter `v` must be a scalar or 1d array.')
-    if isinstance(v, np.ndarray) and not all([np.isscalar(i) for i in v]):
-        raise Exception('Velocity parameter `v` must contain scalars only.')
-    if not isinstance(rover, dict):
-        raise Exception('The parameter `rover` is not a dictionary type.')
+    #Validate the inputs to the function
+    if (type(v) != float) and (type(v) != int) and (not isinstance(v, np.ndarray)):
+        raise Exception("The first input 'v' must be a vector or a scalar and the vector must be an array.")
+    if not isinstance(v,np.ndarray):
+        v = np.array([v],dtype=float)
+    elif (type(rover) != dict):
+        raise Exception("The second input 'rover' must be a dictionary.")
+    elif len(np.shape(v)) != 1:
+        raise Exception("The first input 'v' must be a vector a scalar one one dimension.")
 
     # Calculate the motor and wheel speeds
     omegaWheel = v / rover['wheel_assembly']['wheel']['radius']
