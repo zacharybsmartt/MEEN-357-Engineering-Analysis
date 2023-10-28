@@ -554,13 +554,13 @@ def simulate_rover(rover, planet, experiment, end_event):
 
     # Input parameter validation
     if not isinstance(rover, dict):
-        raise Exception("The first input must be a dictionary.")
+        raise Exception("The first input 'rover' must be a dictionary.")
     if not isinstance(planet, dict):
-        raise Exception("The second input must be a dictionary.")
+        raise Exception("The second 'planet' input must be a dictionary.")
     if not isinstance(experiment, dict):
-        raise Exception("The third input must be a dictionary.")
+        raise Exception("The third input 'experiment' must be a dictionary.")
     if not isinstance(end_event, dict):
-        raise Exception("The fourth input must be a dictionary.")
+        raise Exception("The fourth input 'end_event' must be a dictionary.")
     
     # Calls the rover_dynamics function to compute derivatives
     terrain_function = lambda t , y : rover_dynamics(t,y,rover,planet,experiment)
