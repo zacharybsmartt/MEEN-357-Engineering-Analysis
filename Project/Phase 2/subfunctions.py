@@ -364,7 +364,7 @@ def rover_dynamics(t, y, rover, planet, experiment):
     """
     
     # Check input parameter types
-    if (type(t) != float and type(t) != int and type(t) != np.int64 and type(t) != np.float64):
+    if ((type(t) != float) and (type(t) != int) and (type(t) != np.int64) and (type(t) != np.float64)):
         raise Exception("The first input must be a scalar")
     elif (not isinstance(y,np.ndarray)):
         raise Exception("The second input must be of an array of 2 elements / length 2")
