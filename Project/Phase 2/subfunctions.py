@@ -461,12 +461,18 @@ def battenergy(t, v, rover):
     """
 
     # Check the input data types and dimensions
-    if not isinstance(t, np.ndarray) or not isinstance(v, np.ndarray):
-        raise Exception('The time samples and/or velocity samples parameters must be numpy arrays.')
-    if len(t) != len(v):
-        raise Exception('The time samples vector, `t`, is not equal in length to the velocity samples vector, `v`.')
-    if not isinstance(rover, dict):
-        raise Exception('The parameter `rover` is not a dictionary type.')
+    if (not isinstance(t,np.ndarray)):
+        raise Exception("The first input must be a vector numpy array.")
+    if len(np.shape(v)) != 1:
+        raise Exception("The first input 't' must be a vector or a scalar not a matrix.")
+    if (not isinstance(v, np.ndarray)):
+        raise Exception("The second input 'v' must be a vector numpy array.")
+    if len(np.shape(v)) != 1:
+        raise Exception("The second input 'v' must be a vector or a scalar not a matrix.")
+    if (len(v) != len(t)):
+        raise Exception("The first input 't' and the second input 'v' must be numpy arrays of the same length.")
+    if (type(rover)) != dict:
+        raise Exception("The third input 'rover' must be a dictionary")
 
     # Calculate motor and shaft parameters
     wheelAssembly = 'wheel_assembly'
