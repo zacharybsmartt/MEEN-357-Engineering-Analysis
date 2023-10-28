@@ -362,36 +362,55 @@ def rover_dynamics(t, y, rover, planet, experiment):
     Returns:
     np.ndarray: A 1D numpy array representing the derivative of the state vector.
     """
-
+    
     # Check input parameter types
-    if not isinstance(rover, dict):
-        raise Exception("'rover' must be a dictionary")
-    if not (isinstance(t, (int, float)) and isinstance(y, np.ndarray)):
-        raise Exception("'t' must be a scalar value, and 'y' must be a 1D numpy array")
-    if not isinstance(planet, dict):
-        raise Exception("'planet' must be a dictionary")
-    if not isinstance(experiment, dict):
-        raise Exception("'experiment' must be a dictionary")
-
-    # Get the terrain profile from the experiment
-    alpha_dist = experiment['alpha_dist']
-
-    # Extract current velocity and position from the state vector
-    velocity = float(y[0])
-
-    # Interpolate terrain angle based on the current position
-    alpha_fun = interp1d(alpha_dist, experiment['alpha_deg'], kind='cubic', fill_value='extrapolate')
-    terrain_angle = float(alpha_fun(y[1]))
-
-    # Calculate the motor speed
-    o = motorW(velocity, rover)
-
-    # Calculate acceleration using F_net function
-    accel = F_net(o, terrain_angle, rover, planet, 0.1) / get_mass(rover)
-
-    # Create a new state vector with velocity derivative and position
-    dydt = np.array([float(np.round(accel, 2)), y[0]])
-
+    if (type(t) != float and type(t) != int and type(t) != np.int64 and type(t) != np.float64):
+        raise Exception("The first input must be a scalar")
+    elif (not isinstance(y,np.ndarray)):
+        raise Exception("The second input must be of an array of 2 elements / length 2")
+    
+    #utilize a try except statement for the length of y
+    
+    try:
+        (len(y) != 2)
+    
+    #except statement for a TypeError
+    except TypeError:
+        raise Exception("The second input must be an array of 2 elements / length 2")
+    
+    if len(y) != 2:
+        raise Exception("The second input must be an array of 2 elements / length 2")
+    elif type(rover) != dict:
+        raise Exception("The third input 'rover' must be a dictionary")
+    elif type(planet) != dict:
+        raise Exception("The thrid input 'planet' must be a dictionary")
+    elif type(experiment) != dict:
+        raise Exception("The fifth input 'experiment' must be a dictionary")
+    
+    #convert y from a numpy float to a float if it is an array
+    
+    if (type(y) == np.ndarray):
+        y = y.tolist()
+    #Utilize a cubic approximation for data interpolation
+    interp_function_alpha = interp1d(experiment['alpha_dist'], experiment['alpha_deg'], kind = 'cubic', fill_value = 'extrapolate')
+    #determine the terrain angle
+    terrain_angle = (float(interp_function_alpha(y[1])))
+    #Iniitaite the Crr variable from the experiment dictionary
+    Crr = experiment['Crr']
+    #determien the mass from the get_mass function using the rover dictionary
+    mass = get_mass(rover)
+    #Determine the angular velocity of the motor
+    W = motorW(y[0],rover)
+    #Determine the net force from the data
+    net_force = F_net(W,terrain_angle,rover,planet,Crr)
+    #create a list for dy/dt using zeros
+    dydt = np.zeros(2)
+    #set velocity equal to the second position in the vector array
+    dydt[1] = y[0]
+    
+    #determine the acceleration
+    dydt[0] = net_force/mass
+    
     return dydt
 
 
@@ -576,7 +595,7 @@ def simulate_rover(rover, planet, experiment, end_event):
 
 
 # Test code below
-"""
+
 # Check Outputs
 # print(F_gravity(5,rover,planet)) ###SHOULD EQUAL -282
 # print(F_drive(1,rover)) ###SHOULD EQUAL 7672
@@ -604,4 +623,4 @@ def simulate_rover(rover, planet, experiment, end_event):
 #print(mechpower(0.3,rover))  #should return 101.04 (correct)
 #print(battenergy(np.array([0,1,2,3,4]),np.array([0.33,0.32,0.33,0.2,0.25]),rover))  #should return around 4000, returned 4280.99644 (correct)
 #print(rover_dynamics(20,np.array([0.25,500]),rover,planet,experiment)) #should return np.array([2.86,0.25]) (correct)
-"""
+
