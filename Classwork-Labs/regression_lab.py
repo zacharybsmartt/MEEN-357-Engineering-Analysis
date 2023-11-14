@@ -9,3 +9,4 @@ x = x.reshape(len(x), 1)
 noise =  20 * np.random.normal(size=(np.size(x, 0), np.size(x, 1)))
 y = 30 + 2 * x + 3 * x ** 2 + noise
 
+print('test')
