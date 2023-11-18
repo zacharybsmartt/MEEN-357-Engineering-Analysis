@@ -74,7 +74,7 @@ def define_edl_system_1():
                   'position_control' : position_control,
                   'sky_crane' : sky_crane,
                   'rover' : rover}
-        
+    
     #del parachute, rocket, speed_control, position_control, sky_crane
     #del heat_shield, rover
     return edl_system
