@@ -1,59 +1,66 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from define_rovers import *
+import matplotlib.pyplot as plt
 from define_edl_system import *
+from subfunctions_EDL import *
 from define_planet import *
 from define_mission_events import *
-from subfunctions_EDL import *
-from redefine_edl_system import *
 
+mars = define_planet()
 edl_system = define_edl_system_1()
-rocket = define_edl_system_1()
-heat_shield = define_edl_system_1()
-sky_crane = define_edl_system_1()
-speed_controller = define_edl_system_1()
-position_controller = define_edl_system_1()
-planet = define_planet()
 mission_events = define_mission_events()
-tmax = 2000
 
-diameters = np.arange(14,19.5,0.5)
-times = np.array([])
-v = np.array([])
-fail = np.array([])
+t_terminated = []
+parachute_diameter = []
+rover_speed = []
+rover_landing_success = []
 
-for d in diameters:
-    edl_system = redefine_edl_system(edl_system)
-    edl_system['parachute']['diameter'] = d
-    [t, Y, edl_system] = simulate_edl(edl_system, planet, mission_events, tmax, True)
-    times = np.append(times,t[len(t)-1]) 
-    v = np.append(np.abs(v),Y[0][len(Y[0])-1])
+for i in range(28, 39):
+    edl_system['altitude'] = 11000  # [m] initial altitude
+    edl_system['velocity'] = -590  # [m/s] initial velocity
+    edl_system['rocket']['on'] = False  # rockets off
+    edl_system['parachute']['deployed'] = True  # our parachute is open
+    edl_system['parachute']['ejected'] = False  # and not ejected
+    edl_system['heat_shield']['ejected'] = False  # heat shield not ejected
+    edl_system['sky_crane']['on'] = False  # skycrane inactive
+    edl_system['speed_control']['on'] = False  # speed controller off
+    edl_system['position_control']['on'] = False  # position controller off
+    edl_system['rover']['on_ground'] = False  # the rover has not yet landed
+    edl_system['parachute']['diameter'] = i/2 # range of parachute diameters we are simulating in 
+    tmax = 2000 
 
-    if Y[0][len(Y[0])-1] <= edl_system['sky_crane']['danger_speed']:
-        fail = np.append(fail,0)
-    
+    # simulate and turn off the annoying echo that makes your computer fans go brrr
+    [t, Y, edl_system] = simulate_edl(edl_system, mars, mission_events, tmax, False)
+    t_termination = np.array
+
+    # graphed variables
+    parachute_diameter += [i/2]                         
+    t_terminated += [t[-1]]                             
+    rover_speed += [Y[0, -1]]                          
+    if edl_system['velocity'] < -1:
+        rover_landing_success += [0]
     else:
-        fail = np.append(fail,1)
-
-plt.subplot(3,1,1)
-plt.plot(diameters, times)
-plt.xlabel('Diameter (m)')
-plt.ylabel('Time (s)')
-plt.title('Simulated Time vs. Diameter')
+        rover_landing_success += [1]
 
 
-plt.subplot(3,1,2)
-plt.plot(diameters, v)
-plt.xlabel('Diameter (m)')
-plt.ylabel('Velocity (m/s)')
-plt.title('Landing Velocity vs. Diameter')
+# Actualy graphing the solution
+fig, axis = plt.subplots(3)
+fig.subplots_adjust(hspace=1.2)
+axis[0].plot(parachute_diameter, t_terminated)
+axis[0].set_xlabel('Parachute diameter (m)')
+axis[0].set_ylabel('t terminated (s)')
+axis[0].set_title('Time Terminated vs. Parachute diameter')
+axis[0].grid()
 
+axis[1].plot(parachute_diameter, rover_speed)
+axis[1].set_title('Rover speed vs Parachute diameter')
+axis[1].set_xlabel('Parachute_diameter (m)')
+axis[1].set_ylabel('rover Speed (m/s)')
+axis[1].grid()
 
-plt.subplot(3,1,3)
-plt.plot(diameters,fail)
-plt.xlabel('Diameter (m)')
-plt.ylabel('Success/Failure')
-plt.title('Success and Failure vs. Diameter')
-
+axis[2].plot(parachute_diameter, rover_landing_success)
+axis[2].set_title('Landing Success vs Parachute diameter')
+axis[2].set_xlabel('Parachute_diameter (m)')
+axis[2].set_ylabel('Landing Success (Y-1/N-0)')
+axis[2].grid()
 
 plt.show()
