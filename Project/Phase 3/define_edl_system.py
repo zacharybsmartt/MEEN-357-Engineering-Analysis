@@ -57,8 +57,8 @@ def define_edl_system_1():
     # Heat shield dict
     heat_shield = {'ejected' : False,  # true means heat shield has been ejected from system
                    'mass' : 225.0,     # [kg] mass of heat shield
-                   'diameter' : 4.5,   # [m]
-                   'Cd' : 0.35}        # [-]
+                   'diameter' : 4.5,   # [m] diameter of heat shield
+                   'Cd' : 0.35}        # [-] coefficient of drag for the heat shield
         
     rover = define_rover_4()
         
@@ -67,13 +67,13 @@ def define_edl_system_1():
                   'velocity' : np.NaN,   # system state variable that is updated throughout simulation
                   'num_rockets' : 8,     # system level parameter
                   'volume' :150,         # system level parameter
-                  'parachute' : parachute,
-                  'heat_shield' : heat_shield,
-                  'rocket' : rocket,
-                  'speed_control' : speed_control,
-                  'position_control' : position_control,
-                  'sky_crane' : sky_crane,
-                  'rover' : rover}
+                  'parachute' : parachute,  # subdictionary representing the parachute
+                  'heat_shield' : heat_shield, #subdictionary representing the heat shield.
+                  'rocket' : rocket, # subdictionary representing the rocket booster
+                  'speed_control' : speed_control, # subdictionary representing the PID speed controller
+                  'position_control' : position_control, # subdictionary representing the PID altitude controller
+                  'sky_crane' : sky_crane, # subdictionary containing parameters for the sky crane.
+                  'rover' : rover} # subdictionary containing rover parameters.
     
     #del parachute, rocket, speed_control, position_control, sky_crane
     #del heat_shield, rover
