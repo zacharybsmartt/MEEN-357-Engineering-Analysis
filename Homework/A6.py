@@ -175,8 +175,8 @@ r2_linear = r2_score(yd, yd_pred_linear)
 best_fit = max([(r2_6th, '6th Order Polynomial'), (r2_cubic, 'Cubic Polynomial'), (r2_linear, 'Linear Polynomial')],
                key=lambda x: x[0])
 
-print("Best Fit: {}".format(best_fit[1]))
-print("R-squared value: {}".format(best_fit[0]))
+# print("Best Fit: {}".format(best_fit[1]))
+# print("R-squared value: {}".format(best_fit[0]))
 
 # Plot the results
 plt.scatter(xd, yd, label='Data Points')
