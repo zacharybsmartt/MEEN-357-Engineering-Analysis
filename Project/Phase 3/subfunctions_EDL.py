@@ -117,9 +117,9 @@ def F_drag_descent(edl_system,planet,altitude,velocity):
     #End Task 6 EDIT
 
     if not edl_system['heat_shield']['ejected']:
-        ACd_body = np.pi*(edl_system['heat_shield']['diameter']/2.0)**2*dragCoefficient(edl_system['heat_shield']['Cd'])
+        ACd_body = np.pi*(edl_system['heat_shield']['diameter']/2.0)**2*edl_system['heat_shield']['Cd']
     else:
-        ACd_body = edl_system['sky_crane']['area']*dragCoefficient(edl_system['sky_crane']['Cd'])
+        ACd_body = edl_system['sky_crane']['area']*edl_system['sky_crane']['Cd']
 
     
     # if the parachute is in the deployed state, need to account for its area
