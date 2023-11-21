@@ -112,7 +112,7 @@ def F_drag_descent(edl_system,planet,altitude,velocity):
         mach = v2M_Mars(velocity, altitude) # Get the current Mach value
         machValues = [0.25, 0.5, 0.65,0.7,0.8,0.9,0.95, 1.0, 1.1,1.2, 1.3, 1.4,1.5, 1.6, 1.8,1.9, 2.0, 2.2,2.5, 2.6]
         machEfficiencyNumberValues = [1.0, 1.0, 1.0, 0.97, 0.91, 0.72, 0.66, 0.75, 0.90, 0.96, 0.990, 0.999, 0.992, 0.98, 0.91, 0.85, 0.82, 0.75, 0.64, 0.62]
-        machEfficiencyNumber = interp1d(mach, machEfficiencyNumber)# I would define this globally but I want Task 6 to be closed.
+        machEfficiencyNumber = interp1d(machValues, machEfficiencyNumberValues)# I would define this globally but I want Task 6 to be closed.
         return Cd*machEfficiencyNumber(mach)
     #End Task 6 EDIT
 
