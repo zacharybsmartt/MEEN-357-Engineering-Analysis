@@ -108,12 +108,19 @@ def F_drag_descent(edl_system,planet,altitude,velocity):
     #Task 6 EDIT:
     # The coefficient of drag is nonlinear but is some function of speed.
     # the modification is Cd_mod = Cd*Mach_Velocity Efficiency Number as a function of (Mach speed)
+    UseTask6Edit = True
     def dragCoefficient(Cd):
+        if not UseTask6Edit:
+            return Cd
         mach = v2M_Mars(velocity, altitude) # Get the current Mach value
         machValues = [0.25, 0.5, 0.65,0.7,0.8,0.9,0.95, 1.0, 1.1,1.2, 1.3, 1.4,1.5, 1.6, 1.8,1.9, 2.0, 2.2,2.5, 2.6]
         machEfficiencyNumberValues = [1.0, 1.0, 1.0, 0.97, 0.91, 0.72, 0.66, 0.75, 0.90, 0.96, 0.990, 0.999, 0.992, 0.98, 0.91, 0.85, 0.82, 0.75, 0.64, 0.62]
-        machEfficiencyNumber = interp1d(machValues, machEfficiencyNumberValues)# I would define this globally but I want Task 6 to be closed.
-        return Cd*machEfficiencyNumber(mach)
+        innerInterpolateFunction = interp1d(machValues, machEfficiencyNumberValues, bounds_error=False, fill_value=(1,0))# I would define this globally but I want Task 6 to be closed.
+        correctionFactor = 0
+        if mach > max(machValues):
+            correctionFactor = np.exp(-(mach-1.58564)/2.09082) # using model regression, this function decays in a way that makes sense assuming no humps as in mach 1. See the report for more information.
+        machEfficiencyNumber = innerInterpolateFunction(mach) + correctionFactor #Suppose asymptotic behavior of MEF = 1 when mach really small and MEF = 0 when mach is really large.
+        return Cd*machEfficiencyNumber
     #End Task 6 EDIT
 
     if not edl_system['heat_shield']['ejected']:
