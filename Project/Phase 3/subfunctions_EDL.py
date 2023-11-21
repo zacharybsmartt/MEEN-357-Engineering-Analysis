@@ -103,6 +103,26 @@ def F_drag_descent(edl_system,planet,altitude,velocity):
     
     # If the heat shield has not been ejected, use that as our drag
     # contributor. Otherwise, use the sky crane.
+
+
+    #Task 6 EDIT:
+    # The coefficient of drag is nonlinear but is some function of speed.
+    # the modification is Cd_mod = Cd*Mach_Velocity Efficiency Number as a function of (Mach speed)
+    UseTask6Edit = True
+    def dragCoefficient(Cd):
+        if not UseTask6Edit: #for analysis purposes
+            return Cd
+        mach = v2M_Mars(velocity, altitude) # Get the current Mach value
+        machValues = [0.25, 0.5, 0.65,0.7,0.8,0.9,0.95, 1.0, 1.1,1.2, 1.3, 1.4,1.5, 1.6, 1.8,1.9, 2.0, 2.2,2.5, 2.6]
+        machEfficiencyNumberValues = [1.0, 1.0, 1.0, 0.97, 0.91, 0.72, 0.66, 0.75, 0.90, 0.96, 0.990, 0.999, 0.992, 0.98, 0.91, 0.85, 0.82, 0.75, 0.64, 0.62]
+        innerInterpolateFunction = interp1d(machValues, machEfficiencyNumberValues, bounds_error=False, fill_value=(1,0))# I would define this globally but I want Task 6 to be closed.
+        # using model regression, this function decays in a way that makes sense assuming no humps as with the MEN at mach 1. See the report for more information.
+        # select clause in numpy allows machEfficiencyNumber to handle numpy arrays as well as floats.
+        machEfficiencyNumber = np.select([mach > np.max(machValues), mach <= np.max(machValues)],[np.exp(-(mach-1.58564)/2.09082), innerInterpolateFunction(mach)]) 
+        #Suppose asymptotic behavior of MEF = 1 when mach really small and MEF = 0 when mach is really large.
+        return Cd*machEfficiencyNumber
+    #End Task 6 EDIT
+
     if not edl_system['heat_shield']['ejected']:
         ACd_body = np.pi*(edl_system['heat_shield']['diameter']/2.0)**2*edl_system['heat_shield']['Cd']
     else:
@@ -112,7 +132,7 @@ def F_drag_descent(edl_system,planet,altitude,velocity):
     # if the parachute is in the deployed state, need to account for its area
     # in the drag calculation
     if edl_system['parachute']['deployed'] and not edl_system['parachute']['ejected']:
-        ACd_parachute = np.pi*(edl_system['parachute']['diameter']/2.0)**2*edl_system['parachute']['Cd']
+        ACd_parachute = np.pi*(edl_system['parachute']['diameter']/2.0)**2*dragCoefficient(edl_system['parachute']['Cd'])
     else:
         ACd_parachute = 0.0
     
