@@ -57,7 +57,8 @@ max_batt_energy_per_meter = edl_system['rover']['power_subsys']['battery']['capa
 bounds = Bounds([14, 0.2, 250, 0.05, 100], [19, 0.7, 800, 0.12, 290])
 
 # initial guess
-x0 = [17.0, 0.7, 445.0, 0.05, 266.0]
+#x0 = [17.0, 0.7, 445.0, 0.05, 266.0]
+#x0 = [19, .7, 550.0, 0.09, 250.0]
 
 # lambda for the objective function
 obj_f = lambda x: obj_fun_time(x,edl_system,planet,mission_events,tmax,
