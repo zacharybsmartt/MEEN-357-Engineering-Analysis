@@ -82,7 +82,7 @@ Nfeval = 1
 def callbackF(Xi):  # this is for SLSQP reporting during optimization
     global Nfeval
     if Nfeval == 1:
-        print('Iter        x0         x1        x2        x3         x4                   fval')
+        print('Iter        x0         x1        x2        x3         x4           fval')
         
     print('{0:4d}   {1: 3.6f}   {2: 3.6f}   {3: 3.6f}   {4: 3.6f}  {5: 3.6f} \
           {6: 3.6f}'.format(Nfeval, Xi[0], Xi[1], Xi[2], Xi[3], Xi[4], obj_f(Xi)))
