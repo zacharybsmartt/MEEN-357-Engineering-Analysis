@@ -17,7 +17,7 @@ edl_system = define_edl_system()
 mission_events = define_mission_events()
 edl_system = define_chassis(edl_system,'steel')
 edl_system = define_motor(edl_system,'speed')
-edl_system = define_batt_pack(edl_system,'NiMH', 10)
+edl_system = define_batt_pack(edl_system,'NiMH', 9)
 tmax = 5000
 
 # Overrides what might be in the loaded data to establish our desired
@@ -229,7 +229,7 @@ edl_system['team_name'] = 'Land or Die'  # change this to something fun for your
 edl_system['team_number'] = 3    # change this to your assigned team number (also change it below when saving your pickle file)
 
 # This will create a file that you can submit as your competition file.
-with open('FA23_501team03.pickle', 'wb') as handle:
+with open('FA23_505team03.pickle', 'wb') as handle:
     pickle.dump(edl_system, handle, protocol=pickle.HIGHEST_PROTOCOL)
 # *****************************************************************************
 
