@@ -1,13 +1,14 @@
 import numpy as np
 from subfunctions_Phase4 import *
 from define_experiment import *
+import csv
 from scipy.optimize import minimize, differential_evolution
 from scipy.optimize import Bounds
+import copy
 from scipy.optimize import NonlinearConstraint
 import pickle
-import copy
 import sys
-import csv
+
 
 # the following calls instantiate the needed structs and also make some of
 # our design selections (battery type, etc.)
