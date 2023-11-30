@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 15 22:58:03 2021
-
-@author: Marvin Engineering Design Team
-"""
-
 import numpy as np
 from subfunctions_Phase4 import *
 from define_experiment import *
@@ -13,21 +5,24 @@ from scipy.optimize import minimize, differential_evolution
 from scipy.optimize import Bounds
 from scipy.optimize import NonlinearConstraint
 import pickle
+import copy
 import sys
+import csv
 
 # the following calls instantiate the needed structs and also make some of
 # our design selections (battery type, etc.)
 planet = define_planet()
 edl_system = define_edl_system()
 mission_events = define_mission_events()
-edl_system = define_chassis(edl_system,'carbon')
-edl_system = define_motor(edl_system,'base')
-edl_system = define_batt_pack(edl_system,'PbAcid-1', 10)
+edl_system = define_chassis(edl_system,'steel')
+edl_system = define_motor(edl_system,'speed')
+edl_system = define_batt_pack(edl_system,'NiMH', 10)
 tmax = 5000
 
 # Overrides what might be in the loaded data to establish our desired
 # initial conditions
 edl_system['altitude'] = 11000    # [m] initial altitude
+####CHECK###############################################################################################
 edl_system['velocity'] = -587     # [m/s] initial velocity
 edl_system['parachute']['deployed'] = True   # our parachute is open
 edl_system['parachute']['ejected'] = False   # and still attached
@@ -56,10 +51,13 @@ max_batt_energy_per_meter = edl_system['rover']['power_subsys']['battery']['capa
 # search bounds
 #x_lb = np.array([14, 0.2, 250, 0.05, 100])
 #x_ub = np.array([19, 0.7, 800, 0.12, 290])
+
+
+############CONFIGURE BOUNDS###################################
 bounds = Bounds([14, 0.2, 250, 0.05, 100], [19, 0.7, 800, 0.12, 290])
 
 # initial guess
-x0 = np.array([19, .7, 550.0, 0.09, 250.0]) 
+x0 = [17.0, 0.7, 445.0, 0.05, 266.0]
 
 # lambda for the objective function
 obj_f = lambda x: obj_fun_time(x,edl_system,planet,mission_events,tmax,
@@ -83,7 +81,7 @@ Nfeval = 1
 def callbackF(Xi):  # this is for SLSQP reporting during optimization
     global Nfeval
     if Nfeval == 1:
-        print('Iter        x0         x1        x2        x3         x4           fval')
+        print('Iter        x0         x1        x2        x3         x4                   fval')
         
     print('{0:4d}   {1: 3.6f}   {2: 3.6f}   {3: 3.6f}   {4: 3.6f}  {5: 3.6f} \
           {6: 3.6f}'.format(Nfeval, Xi[0], Xi[1], Xi[2], Xi[3], Xi[4], obj_f(Xi)))
@@ -92,27 +90,27 @@ def callbackF(Xi):  # this is for SLSQP reporting during optimization
 
 
 # The optimizer options below are
-# 'trust-constr'
-# 'SLSQP'
-# 'differential_evolution'
-# 'COBYLA'
+# 'trust-constr' 
+# 'SLSQP'  
+# 'COBYLA' 
 # You should fully comment out all but the one you wish to use
 
 ###############################################################################
-#call the trust-constr optimizer --------------------------------------------#
-options = {'maxiter': 5, 
-            # 'initial_constr_penalty' : 5.0,
-            # 'initial_barrier_parameter' : 1.0,
-            'verbose' : 3,
-            'disp' : True}
-res = minimize(obj_f, x0, method='trust-constr', constraints=nonlinear_constraint, 
-                options=options, bounds=bounds)
-# end call to the trust-constr optimizer -------------------------------------#
+# call the trust-constr optimizer --------------------------------------------#
+# options = {'maxiter': 15, 
+#             # 'initial_constr_penalty': 5.0,
+#             # 'initial_barrier_parameter': 1.0,
+#             'verbose' : 3,
+#             'disp' : True}
+# res = minimize(obj_f, x0, method='trust-constr', constraints=nonlinear_constraint, 
+#                 options=options, bounds=bounds)
+#end call to the trust-constr optimizer -------------------------------------#
 ###############################################################################
 
 ###############################################################################
 # call the SLSQP optimizer ---------------------------------------------------#
-# options = {'maxiter': 5,
+# bounds = Bounds([16, 0.4, 250, 0.05, 200], [19, 0.7, 800, 0.12, 290])  # these can be changed
+# options = {'maxiter': 50,
 #             'disp' : True}
 # res = minimize(obj_f, x0, method='SLSQP', constraints=ineq_cons, bounds=bounds, 
 #                 options=options, callback=callbackF)
@@ -120,31 +118,33 @@ res = minimize(obj_f, x0, method='trust-constr', constraints=nonlinear_constrain
 ###############################################################################
 
 ###############################################################################
-# call the differential evolution optimizer ----------------------------------#
-# popsize=2 # define the population size
-# maxiter=1 # define the maximum number of iterations
-# res = differential_evolution(obj_f, bounds=bounds, constraints=nonlinear_constraint, popsize=popsize, maxiter=maxiter, disp=True, polish = False) 
-# end call the differential evolution optimizer ------------------------------#
+# call the COBYLA optimizer --------------------------------------------------#
+cobyla_bounds = [[14, 19], [0.3, 0.7], [100, 500], [0.05, 0.3], [100, 290]]
+# # #construct the bound s in the form of constraints
+cons_cobyla = []
+for factor in range(len(cobyla_bounds)):
+    lower, upper = cobyla_bounds[factor]
+    l = {'type': 'ineq',
+          'fun': lambda x, lb=lower, i=factor: x[i] - lb}
+    u = {'type': 'ineq',
+          'fun': lambda x, ub=upper, i=factor: ub - x[i]}
+    cons_cobyla.append(l)
+    cons_cobyla.append(u)
+    cons_cobyla.append(ineq_cons)  # the rest of the constraints
+#reduce the maxiteration size
+options = {'maxiter':30,
+            'disp' : True}
+res = minimize(obj_f, x0, method='COBYLA', constraints=cons_cobyla, options=options)
+# end call to the COBYLA optimizer -------------------------------------------#
 ###############################################################################
 
 ###############################################################################
-# call the COBYLA optimizer --------------------------------------------------#
-# cobyla_bounds = [[14, 19], [0.2, 0.7], [250, 800], [0.05, 0.12], [100, 290]]
-# #construct the bounds in the form of constraints
-# cons_cobyla = []
-# for factor in range(len(cobyla_bounds)):
-    # lower, upper = cobyla_bounds[factor]
-    # l = {'type': 'ineq',
-          # 'fun': lambda x, lb=lower, i=factor: x[i] - lb}
-    # u = {'type': 'ineq',
-          # 'fun': lambda x, ub=upper, i=factor: ub - x[i]}
-    # cons_cobyla.append(l)
-    # cons_cobyla.append(u)
-    # cons_cobyla.append(ineq_cons)  # the rest of the constraints
-# options = {'maxiter': 50, 
-            # 'disp' : True}
-# res = minimize(obj_f, x0, method='COBYLA', constraints=cons_cobyla, options=options)
-# end call to the COBYLA optimizer -------------------------------------------#
+# call the differential evolution optimizer ----------------------------------#
+# popsize=5 # define the population size
+# maxiter=10 # define the maximum number of iterations
+# res = differential_evolution(obj_f, bounds=bounds, constraints=nonlinear_constraint, 
+#                               popsize=popsize, maxiter=maxiter, disp=True, polish = False) 
+# end call the differential evolution optimizer ------------------------------#
 ###############################################################################
 
 
@@ -153,7 +153,50 @@ c = constraints_edl_system(res.x,edl_system,planet,mission_events,tmax,experimen
                            end_event,min_strength,max_rover_velocity,max_cost,
                            max_batt_energy_per_meter)
 
-feasible = np.max(c - np.zeros(len(c))) <= 0
+#Iterate through the constraints to check conditions
+
+feasible = True
+if c[0] > 1e-15:
+    feasible = False
+    print('The Distance Restriction Did Not Meet The Constraint')
+    
+elif c[1] > 0:
+    feasible = False
+    print('The Strength Restriction Did Not Meet The Constraint')
+
+elif c[2] > 0:
+    feasible = False
+    print('The Velocity Restriction Did Not Meet The Constraint')
+
+elif c[3] > 0:
+    feasible = False
+    print('The Cost Restriction Did Not Meet The Constraint')
+
+elif c[4] > 0:
+    feasible = False
+    print('The Battery Restriction Was Not Met')
+
+elif res.x[0] > 19*1.000001 or res.x[0] < 14*0.999999:
+    feasible = False
+    print('The Parachute Restriction Exceeded the Bounds')
+
+elif res.x[1] > 0.7*1.000001 or res.x[1] < 0.2*0.999999:
+    feasible = False
+    print('The Wheel Radius Restriction Exceeded the Bounds')
+
+elif res.x[2] > 800*1.000001 or res.x[2] < 250*0.999999:
+    feasible = False
+    print('The Chassis Mass Restriction Exceeded the Bounds')
+
+elif res.x[3] > 0.12*1.000001 or res.x[3] < 0.05*0.999999:
+    feasible = False
+    print('The Gear Diameter Restriction Exceeded the Bounds')
+
+elif res.x[4] > 290*1.000001 or res.x[4] < 100*0.999999:
+    feasible = False
+    print('The Fuel Mass Restriction Exceeded the Bounds')
+
+
 if feasible:
     xbest = res.x
     fbest = res.fun
@@ -162,8 +205,6 @@ else:  # nonsense to let us know this did not work
     fval = [99999]
     raise Exception('Solution not feasible, exiting code...')
     sys.exit()
-
-# What about the design variable bounds?
 
 # The following will rerun your best design and present useful information
 # about the performance of the design
@@ -182,11 +223,11 @@ edl_system['rocket']['fuel_mass'] = xbest[4]
 # These lines save your design for submission for the rover competition.
 # You will want to change them to match your team information.
 
-edl_system['team_name'] = 'FunTeamName'  # change this to something fun for your team (or just your team number)
-edl_system['team_number'] = 99    # change this to your assigned team number (also change it below when saving your pickle file)
+edl_system['team_name'] = 'Land or Die'  # change this to something fun for your team (or just your team number)
+edl_system['team_number'] = 3    # change this to your assigned team number (also change it below when saving your pickle file)
 
 # This will create a file that you can submit as your competition file.
-with open('FA23_501team99.pickle', 'wb') as handle:
+with open('FA23_501team03.pickle', 'wb') as handle:
     pickle.dump(edl_system, handle, protocol=pickle.HIGHEST_PROTOCOL)
 # *****************************************************************************
 
@@ -203,6 +244,7 @@ time_rover = edl_system['rover']['telemetry']['completion_time']
 total_time = time_edl + time_rover
  
 edl_system_total_cost=get_cost_edl(edl_system)
+
 
 print('----------------------------------------')
 print('----------------------------------------')
