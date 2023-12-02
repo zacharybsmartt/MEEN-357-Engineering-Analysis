@@ -31,6 +31,9 @@ def gradient_ascent(x, y, step_size, tolerance):
 
     return x, y, objective_function(x, y), iterations
 
+# Arrow function to add arrows to the plot
+def add_arrow(ax, start, end):
+    ax.annotate('', xy=end, xytext=start, arrowprops=dict(facecolor='black', arrowstyle='->'))
 
 x0, y0 = 5, 5
 
@@ -39,7 +42,6 @@ step_size_a = 0.1
 tolerance_a = 1e-8
 
 x_a, y_a, f_star_a, iterations_a = gradient_ascent(x0, y0, step_size_a, tolerance_a)
-
 
 x_vals = np.linspace(-6, 6, 100)
 y_vals = np.linspace(-6, 6, 100)
@@ -51,6 +53,10 @@ plt.scatter(x_a, y_a, color='red', label=f'Optimal Point: ({x_a:.3f}, {y_a:.3f})
 plt.title('Gradient Ascent with Step Size 0.1')
 plt.xlabel('x')
 plt.ylabel('y')
+
+# Add arrow for part (a)
+add_arrow(plt.gca(), (x0, y0), (x_a, y_a))
+
 plt.legend()
 plt.show()
 
@@ -65,12 +71,15 @@ tolerance_b = 1e-8
 
 x_b, y_b, f_star_b, iterations_b = gradient_ascent(x0, y0, step_size_b, tolerance_b)
 
-
 plt.contour(X, Y, Z, levels=20)
 plt.scatter(x_b, y_b, color='red', label=f'Optimal Point: ({x_b:.3f}, {y_b:.3f})')
 plt.title('Gradient Ascent with Step Size 0.25')
 plt.xlabel('x')
 plt.ylabel('y')
+
+# Add arrow for part (b)
+add_arrow(plt.gca(), (x0, y0), (x_b, y_b))
+
 plt.legend()
 plt.show()
 
