@@ -31,16 +31,16 @@ def gradient_ascent(x, y, step_size, tolerance):
 
     return x, y, objective_function(x, y), iterations
 
-# Initial guess
+
 x0, y0 = 5, 5
 
-# Part (a) with step size 0.1
+# Part (a)
 step_size_a = 0.1
 tolerance_a = 1e-8
 
 x_a, y_a, f_star_a, iterations_a = gradient_ascent(x0, y0, step_size_a, tolerance_a)
 
-# Visualize the objective space with contours
+
 x_vals = np.linspace(-6, 6, 100)
 y_vals = np.linspace(-6, 6, 100)
 X, Y = np.meshgrid(x_vals, y_vals)
@@ -59,13 +59,13 @@ print(f"Optimal function value (f*): {f_star_a:.5f}")
 print(f"Optimal design variables (x*, y*): ({x_a:.5f}, {y_a:.5f})")
 print(f"Number of iterations: {iterations_a}")
 
-# Part (b) with step size 0.25
+# Part (b)
 step_size_b = 0.25
 tolerance_b = 1e-8
 
 x_b, y_b, f_star_b, iterations_b = gradient_ascent(x0, y0, step_size_b, tolerance_b)
 
-# Visualize the objective space with contours
+
 plt.contour(X, Y, Z, levels=20)
 plt.scatter(x_b, y_b, color='red', label=f'Optimal Point: ({x_b:.3f}, {y_b:.3f})')
 plt.title('Gradient Ascent with Step Size 0.25')
